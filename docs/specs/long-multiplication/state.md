@@ -1,10 +1,10 @@
 ---
 idea: long-multiplication
 chain: trunk
-step: 2
+step: 3
 status: refining
 waits on: none
-remaining: 4q + 7r + 0i + 0f
+remaining: 0q + 1r + 16i + 21f
 ---
 
 # Long multiplication, posed as by hand
@@ -17,28 +17,132 @@ remaining: 4q + 7r + 0i + 0f
 
 ## Requirements
 
-- **`r-practise-multiplication`** — A user can practise long multiplication in the app.
-  This version poses no other operation; other operations are later ideas.
-- **`r-posed-layout`** — A multiplication is shown posed as it is done by hand, on several
-  lines: `A`, `× B`, the partial products added up (`CCCCCC + DDDDDD0 + EEEE00`), then the
-  result, with every digit aligned in its column. The trailing zeros of each shifted
-  partial product are written by the app in advance, greyed.
-- **`r-choose-digit-count`** — A user can easily choose the difficulty, as the number of
-  digits of `A` and `B`, which is the same for both, from 2 to 6.
-- **`r-right-to-left-entry`** — A user types each intermediate line right to left, digit
-  after digit, and presses Enter to move to the next line. On a shifted line, typing
-  starts at the first column left of the greyed zeros. No digit is checked while the lines
-  are typed.
-- **`r-check-at-end`** — Once the result line is entered, every typed digit is checked, and
-  the errors are shown.
-- **`r-try-again`** — After the check, a Try again button clears every digit the user typed
-  and poses the same `A` and `B` again.
-- **`r-docker-build`** — The APK is built, and the JVM unit tests run, in a Docker
-  container, with nothing installed on the host but Docker.
+- **`r-modules-follow-contract`** — `multiplication/` and `app/` each follow the root
+  `SPEC.md`'s Contract: `INV-root/module-recognized` and `INV-root/module-dependency`.
+  It leaves the plan once both modules have landed and review has recorded that each
+  follows the Contract.
 
 ## To land
 
-Nothing left to land.
+- **`CAP-root/docker-build`** — On a host with nothing installed but Docker, the APK is
+  built, and the JVM unit tests of every module run, in a Docker container.
+  - **success:** On this host, `./build.sh` writes the debug APK into
+    `app/build/outputs/apk/debug/` and runs the JVM unit tests of every module, which pass.
+  - **lands in:** `SPEC.md`
+  - **held in:** `Dockerfile`, `build.sh` (the container and the command run in it),
+    `settings.gradle.kts`, `build.gradle.kts`, `gradle.properties`, `.gitignore` (the root
+    build), `multiplication/build.gradle.kts`, `app/build.gradle.kts` (each module's build)
+  - **status:** planned
+- **`REQ-root/docker`** — The host has Docker (28.5 is the version the build is run with),
+  and needs no JDK and no Android SDK.
+  - **lands in:** `SPEC.md`
+  - **status:** planned
+- **`INV-root/module-recognized`** — A module is a top-level directory holding a
+  `build.gradle.kts` and a `SPEC.md`; `settings.gradle.kts` includes every such directory
+  it finds on disk, and names none.
+  - **held by:** review: `settings.gradle.kts` names no module, and the build's project
+    list matches the top-level directories holding both files
+  - **lands in:** `SPEC.md`, in its Contract
+  - **status:** planned
+- **`INV-root/module-dependency`** — A module depends on another only through a
+  `project(":<name>")` dependency in its `build.gradle.kts`, and the dependencies form no
+  cycle.
+  - **held by:** review, over every module's `build.gradle.kts`
+  - **lands in:** `SPEC.md`, in its Contract
+  - **status:** planned
+- **`CAP-multiplication/draw-operands`** — For a digit count n from 2 to 6, `A` and `B`
+  are drawn at random, each with exactly n digits.
+  - **success:** A JVM unit test, run in the Docker build, shows that for each n from 2 to
+    6, every one of 1000 draws gives `A` and `B` of exactly n digits.
+  - **lands in:** `multiplication/SPEC.md`
+  - **held in:** `multiplication/src/main/kotlin/mentalarithmetic/multiplication/Operands.kt`
+  - **status:** planned
+- **`CAP-multiplication/partial-products`** — For `A` and `B`, the lines of the posed
+  multiplication are given: one partial product per digit of `B`, from its rightmost digit
+  leftwards, the k-th (from 0) being the digits of `A` times that digit, to be typed, and
+  k shifted zeros written in advance; then the result `A × B`, to be typed. A 0 digit of
+  `B` gives a line whose typed part is the single digit 0.
+  - **success:** A JVM unit test, run in the Docker build, shows for fixed `A` and `B`,
+    one of them with a 0 digit in `B`, each partial product's typed digits and shifted
+    zeros, and the result's digits.
+  - **lands in:** `multiplication/SPEC.md`
+  - **held in:** `multiplication/src/main/kotlin/mentalarithmetic/multiplication/PosedMultiplication.kt`
+  - **status:** planned
+- **`CAP-multiplication/check-lines`** — The lines typed for a posed multiplication are
+  checked column by column against its lines, from the right of each typed part: a typed
+  digit that differs from the expected one is marked wrong, a column expected but not
+  typed is marked missing, and a column typed but not expected is marked extra.
+  - **success:** A JVM unit test, run in the Docker build, shows that lines typed right
+    carry no mark, a wrong digit marks its column wrong, a line too short marks its missing
+    columns, and a line too long marks its extra columns.
+  - **lands in:** `multiplication/SPEC.md`
+  - **held in:** `multiplication/src/main/kotlin/mentalarithmetic/multiplication/Check.kt`
+  - **status:** planned
+- **`CAP-app/pick-digit-count`** — On the one screen, count buttons 2 to 6 sit on top;
+  tapping a count, even the current one, poses a new `A` and `B` with that many digits.
+  - **success:** On the Android Studio emulator on Windows, the user taps each count from
+    2 to 6, the current one too, and each tap poses a new `A × B` with that many digits.
+  - **lands in:** `app/SPEC.md`
+  - **held in:** `app/src/main/kotlin/mentalarithmetic/app/PracticeScreen.kt` (the
+    buttons), `app/src/main/kotlin/mentalarithmetic/app/Practice.kt` (the new problem)
+  - **status:** planned
+- **`CAP-app/posed-layout`** — In the middle of the screen, the multiplication is shown
+  posed as by hand: `A`, `× B`, the partial products added up, then the result, every
+  digit aligned in its column, the shifted zeros written in advance and greyed.
+  - **success:** On the Android Studio emulator on Windows, for each count from 2 to 6, the
+    user sees `A`, `× B`, one line per digit of `B` and the result line, every digit in its
+    column and the shifted zeros greyed.
+  - **lands in:** `app/SPEC.md`
+  - **held in:** `app/src/main/AndroidManifest.xml`,
+    `app/src/main/kotlin/mentalarithmetic/app/MainActivity.kt` (the screen shown at
+    launch), `app/src/main/kotlin/mentalarithmetic/app/PracticeScreen.kt` (the layout)
+  - **status:** planned
+- **`CAP-app/right-to-left-entry`** — On a keypad at the bottom of the screen (7 8 9 /
+  4 5 6 / 1 2 3 / ⌫ 0 Enter), the user types each line right to left, digit after digit,
+  starting at the first column left of its greyed zeros. Enter moves to the next line once
+  the current one holds a digit. Erase removes the last digit typed, and on an empty line
+  goes back to the end of the previous line.
+  - **success:** On the Android Studio emulator on Windows, the user types each partial
+    product and the result right to left with Enter after each, and erases back across a
+    line they already ended.
+  - **lands in:** `app/SPEC.md`
+  - **held in:** `app/src/main/kotlin/mentalarithmetic/app/PracticeScreen.kt` (the
+    keypad), `app/src/main/kotlin/mentalarithmetic/app/Practice.kt` (the entry)
+  - **status:** planned
+- **`CAP-app/check-at-end`** — Once Enter ends the result line, every typed line is
+  checked, and the errors are shown: a wrong digit in red, a missing or extra column
+  marked.
+  - **success:** On the Android Studio emulator on Windows, the user ends the result line
+    and is shown which digits are wrong, missing or extra.
+  - **lands in:** `app/SPEC.md`
+  - **held in:** `app/src/main/kotlin/mentalarithmetic/app/Practice.kt` (the check),
+    `app/src/main/kotlin/mentalarithmetic/app/PracticeScreen.kt` (the marks)
+  - **status:** planned
+- **`CAP-app/try-again`** — After the check, a Try again button takes Enter's place;
+  tapping it clears every digit the user typed and poses the same `A` and `B` again.
+  - **success:** On the Android Studio emulator on Windows, after the check, the user taps
+    Try again, their digits are cleared, and `A` and `B` are unchanged.
+  - **lands in:** `app/SPEC.md`
+  - **held in:** `app/src/main/kotlin/mentalarithmetic/app/Practice.kt` (the reset),
+    `app/src/main/kotlin/mentalarithmetic/app/PracticeScreen.kt` (the button)
+  - **status:** planned
+- **`REQ-app/arithmetic`** — The app needs `CAP-multiplication/draw-operands`,
+  `CAP-multiplication/partial-products` and `CAP-multiplication/check-lines`, through a
+  project dependency on `multiplication`.
+  - **lands in:** `app/SPEC.md`
+  - **status:** planned
+- **`NOT-app/other-operations`** — The app poses no operation but multiplication; other
+  operations are later ideas.
+  - **lands in:** `app/SPEC.md`
+  - **status:** planned
+- **`NOT-app/check-while-typing`** — No digit is checked, and no error is shown, before
+  Enter ends the result line.
+  - **lands in:** `app/SPEC.md`
+  - **status:** planned
+- **`LIM-app/screens-by-manual-review`** — Every capability of the app is shown only by the
+  user's review on the Android Studio emulator on Windows; no test drives the screen.
+  - **lands in:** `app/SPEC.md`
+  - **status:** planned
 
 ## Reopened
 
@@ -60,119 +164,116 @@ Nothing reopened.
 
 - **`a-android`** — The app is an Android app, written in Kotlin with Jetpack Compose.
   - **raised by:** "i want a simple app"
-  - **bears on:** every requirement
+  - **bears on:** every item and file
 - **`a-toolchain`** — This host has no JDK and no Android SDK, and none is installed on it:
   the APK build and the JVM unit tests run in a Docker container that carries both (Docker
   28.5 is already on the host). The APK is then installed on the Android Studio emulator on
   Windows.
   - **raised by:** "i want a simple app"; amended by the answer to `q-validation`
-  - **bears on:** `r-docker-build`, every requirement
+  - **bears on:** `CAP-root/docker-build`, `REQ-root/docker`
 - **`a-one-partial-per-digit`** — There is one partial product per digit of `B`, taken from
   its rightmost digit leftwards. The k-th (counting from 0) is `A` times that digit,
   shifted k columns to the left.
   - **raised by:** "AAAA x BBBB / CCCCCC + DDDDDD0 + EEEE00 / RESULT"
-  - **bears on:** `r-posed-layout`, `r-right-to-left-entry`
+  - **bears on:** `CAP-multiplication/partial-products`, `CAP-app/posed-layout`
 - **`a-no-carries`** — Carries are neither shown nor typed; the user keeps them in their
   head.
   - **raised by:** "comme lorsqu'on le fait à la main"
-  - **bears on:** `r-posed-layout`, `r-right-to-left-entry`
+  - **bears on:** `CAP-app/posed-layout`, `CAP-app/right-to-left-entry`
 - **`a-random-operands`** — For a chosen digit count n, `A` and `B` are drawn at random
   with exactly n digits each (no leading zero).
   - **raised by:** "sélectinnr facilement la compléxité selon le nombre de chiffre de A et
     B (même valeur pour A et B)"
-  - **bears on:** `r-choose-digit-count`
+  - **bears on:** `CAP-multiplication/draw-operands`
 - **`a-result-typed`** — The result line is typed the same way as the partial products:
   right to left, digit after digit, ended by Enter.
   - **raised by:** "type the intermediate computes right to left, digit after digit,
     [enter] for next line"
-  - **bears on:** `r-right-to-left-entry`
+  - **bears on:** `CAP-app/right-to-left-entry`
 - **`a-onscreen-keypad`** — Digits and Enter are typed on a keypad drawn by the app (0–9,
   erase, Enter), not on the system keyboard.
   - **raised by:** "type the intermediate computes right to left, digit after digit,
     [enter] for next line"
-  - **bears on:** `r-right-to-left-entry`
-- **`a-mockup-before-layout`** — The screen layout is settled only after the user has seen
-  a drawing of it.
-  - **raised by:** "We can clarify few things, then build a mockup, then we'll refine"
-  - **bears on:** `r-posed-layout`, `r-choose-digit-count`, `r-right-to-left-entry`
+  - **bears on:** `CAP-app/right-to-left-entry`
 - **`a-errors-per-digit`** — At the check, each typed digit that differs from the expected
   digit in its column is shown in red, and each column where a digit is missing or extra is
   marked too.
   - **raised by:** the answer to `q-error-feedback`, "at the end"
-  - **bears on:** `r-check-at-end`
+  - **bears on:** `CAP-multiplication/check-lines`, `CAP-app/check-at-end`
 - **`a-line-length`** — Each line is typed with as many digits as its value has, with no
   leading zero, so the user decides its length. Enter is accepted on a line of any length
   of at least one digit; a line of the wrong length is wrong at the check.
   - **raised by:** the answer to `q-error-feedback`, "at the end": nothing is checked
     before the end, so Enter cannot refuse a line for its length
-  - **bears on:** `r-right-to-left-entry`, `r-check-at-end`
+  - **bears on:** `CAP-app/right-to-left-entry`, `CAP-multiplication/check-lines`
 - **`a-apk-to-windows`** — The Docker build writes the APK into the repository's build
   output, which the user reaches from Windows through `\\wsl$` and installs by dragging it
   onto the emulator.
   - **raised by:** the answer to `q-validation`
-  - **bears on:** `r-docker-build`, `s-practised-on-emulator`
+  - **bears on:** `CAP-root/docker-build`, `s-practised-on-emulator`
+- **`a-contract-by-review`** — The root Contract's rules are held by review, not by a
+  test: a settings script and a set of build files have no JVM unit test to show them.
+  - **raised by:** the answer to `q-modules`, "the root `SPEC.md` states the module
+    contract"
+  - **bears on:** `INV-root/module-recognized`, `INV-root/module-dependency`
+- **`a-build-versions`** — The build runs on JDK 17 in an `eclipse-temurin:17-jdk` image
+  with the Android command-line tools and Gradle 8.10.2 installed at image build, with
+  Android Gradle Plugin 8.7.3, Kotlin 2.1.0 and its Compose compiler plugin, the Compose
+  BOM 2024.12.01, compileSdk and targetSdk 35, minSdk 26, and JUnit 4.13.2 for the JVM
+  tests. There is no Gradle wrapper: the image carries Gradle.
+  - **raised by:** the answer to `q-modules` (a Gradle build of two modules) and
+    `a-toolchain`
+  - **bears on:** `CAP-root/docker-build`
+- **`a-package-name`** — The Kotlin packages are `mentalarithmetic.multiplication` and
+  `mentalarithmetic.app`, and the application id is `mentalarithmetic.app`.
+  - **raised by:** the answer to `q-modules` (the two modules' names)
+  - **bears on:** every file under `multiplication/` and `app/`
+- **`a-locked-after-check`** — After the check, the digit and erase keys do nothing until
+  Try again or a count button is tapped.
+  - **raised by:** the answer to `q-screen-layout`, "After the check, Try again replaces
+    Enter"
+  - **bears on:** `CAP-app/check-at-end`, `CAP-app/try-again`
 
 ## Files
 
-Nothing placed yet.
+- `SPEC.md` — holds: `CAP-root/docker-build`, `REQ-root/docker`,
+  `INV-root/module-recognized`, `INV-root/module-dependency` — planned
+- `Dockerfile` — holds: `CAP-root/docker-build` — planned
+- `build.sh` — holds: `CAP-root/docker-build` — planned
+- `settings.gradle.kts` — holds: `CAP-root/docker-build` — planned
+- `build.gradle.kts` — holds: `CAP-root/docker-build` — planned
+- `gradle.properties` — holds: `CAP-root/docker-build` — planned
+- `.gitignore` — holds: `CAP-root/docker-build` — planned
+- `multiplication/SPEC.md` — holds: `CAP-multiplication/draw-operands`,
+  `CAP-multiplication/partial-products`, `CAP-multiplication/check-lines` — planned
+- `multiplication/build.gradle.kts` — holds: `CAP-root/docker-build` — planned
+- `multiplication/src/main/kotlin/mentalarithmetic/multiplication/Operands.kt` — holds:
+  `CAP-multiplication/draw-operands` — planned
+- `multiplication/src/main/kotlin/mentalarithmetic/multiplication/PosedMultiplication.kt` —
+  holds: `CAP-multiplication/partial-products` — planned
+- `multiplication/src/main/kotlin/mentalarithmetic/multiplication/Check.kt` — holds:
+  `CAP-multiplication/check-lines` — planned
+- `multiplication/src/test/kotlin/mentalarithmetic/multiplication/OperandsTest.kt` — holds:
+  `CAP-multiplication/draw-operands` (demonstrates) — planned
+- `multiplication/src/test/kotlin/mentalarithmetic/multiplication/PosedMultiplicationTest.kt`
+  — holds: `CAP-multiplication/partial-products` (demonstrates) — planned
+- `multiplication/src/test/kotlin/mentalarithmetic/multiplication/CheckTest.kt` — holds:
+  `CAP-multiplication/check-lines` (demonstrates) — planned
+- `app/SPEC.md` — holds: `CAP-app/pick-digit-count`, `CAP-app/posed-layout`,
+  `CAP-app/right-to-left-entry`, `CAP-app/check-at-end`, `CAP-app/try-again`,
+  `REQ-app/arithmetic`, `NOT-app/other-operations`, `NOT-app/check-while-typing`,
+  `LIM-app/screens-by-manual-review` — planned
+- `app/build.gradle.kts` — holds: `CAP-root/docker-build` — planned
+- `app/src/main/AndroidManifest.xml` — holds: `CAP-app/posed-layout` — planned
+- `app/src/main/kotlin/mentalarithmetic/app/MainActivity.kt` — holds:
+  `CAP-app/posed-layout` — planned
+- `app/src/main/kotlin/mentalarithmetic/app/PracticeScreen.kt` — holds:
+  `CAP-app/pick-digit-count`, `CAP-app/posed-layout`, `CAP-app/right-to-left-entry`,
+  `CAP-app/check-at-end`, `CAP-app/try-again` — planned
+- `app/src/main/kotlin/mentalarithmetic/app/Practice.kt` — holds:
+  `CAP-app/pick-digit-count`, `CAP-app/right-to-left-entry`, `CAP-app/check-at-end`,
+  `CAP-app/try-again` — planned
 
 ## Open Questions
 
-- **`q-modules`** — How is the code split into modules?
-  - **options:**
-    - (a) Two: `multiplication/`, a plain Kotlin module holding the arithmetic (drawing
-      `A` and `B`, the partial products, checking the typed lines), and `app/`, the Android
-      app (screens, keypad, entry), which depends on it
-    - (b) One: `app/` holds everything
-    - (c) Three: `multiplication/` (the arithmetic), `practice/` (plain Kotlin: the entry
-      and check rules of one problem), and `app/` (screens and keypad)
-  - **recommended:** (a), because the arithmetic gets quick JVM tests with no Android in
-    them, and the entry rules can still be unit-tested in `app/`. In every option the root
-    `SPEC.md` states the module contract: a module is a top-level directory holding a
-    `build.gradle.kts` and a `SPEC.md`, and `settings.gradle.kts` includes every such
-    directory it finds on disk.
-  - **unblocks:** the landing place of every requirement, the root `SPEC.md`,
-    `settings.gradle.kts`, `r-docker-build`
-  - **raised by:** the answer to `q-validation` (the JVM unit tests run per module) and the
-    answer to `q-other-operations` (one operation, one arithmetic)
-  - **answer:** (a): "multiplication + app (Recommended)" (2026-09-22, in the conversation)
-- **`q-screen-layout`** — How are the screens laid out? (Drawings shown in the
-  conversation.)
-  - **options:**
-    - (a) One screen: digit-count buttons 2 to 6 on top, where tapping a count, even the
-      current one, draws a new `A` and `B`; the posed multiplication in the middle; the
-      keypad (0–9, erase, Enter) at the bottom. After the check, Try again replaces Enter.
-    - (b) Two screens: a start screen to pick the digit count, then a practice screen with
-      the posed multiplication and the keypad, and a back arrow to change the count
-  - **recommended:** (a), because the difficulty is one tap from the problem, which is what
-    "easily" asks, and a 6-digit problem (a 12-digit result, 14 columns with the signs)
-    still fits a phone held upright.
-  - **unblocks:** `r-posed-layout`, `r-choose-digit-count`, `r-right-to-left-entry`,
-    `r-check-at-end`, `r-try-again`, `a-mockup-before-layout`
-  - **raised by:** the answer to `q-digit-range` (6 digits sets the widest layout), the
-    answer to `q-error-feedback` (the Try again button needs a place), and
-    `a-mockup-before-layout`
-  - **answer:** (a): "One screen (Recommended)", chosen on a drawing of a 3-digit problem: count buttons [2]–[6] on top, the posed multiplication with greyed pre-filled zeros in the middle, the keypad [7 8 9 / 4 5 6 / 1 2 3 / ⌫ 0 Enter] at the bottom (2026-09-22, in the conversation)
-- **`q-back-to-line`** — Can the user go back to a line they already ended with Enter?
-  - **options:**
-    - (a) Yes: erase on an empty line goes back to the end of the previous line
-    - (b) No: erase works only within the current line; Try again is the way to start over
-    - (c) Yes: tapping any line puts the entry back on it
-  - **recommended:** (a), because nothing is checked before the end, so a slip on an
-    earlier line should be fixable, and this needs no extra control.
-  - **unblocks:** `r-right-to-left-entry`
-  - **raised by:** the answer to `q-error-feedback`, "at the end"
-  - **answer:** (a): "Erase goes back (Recommended)" (2026-09-22, in the conversation)
-- **`q-zero-digit`** — When a digit of `B` is 0, its partial product is 0. What happens to
-  its line?
-  - **options:**
-    - (a) The line is shown, and the user types a single 0 left of its greyed zeros
-    - (b) The line is left out; the next line keeps its own shift
-    - (c) The app writes the whole line, greyed, like the shifted zeros
-  - **recommended:** (a), because it keeps one line per digit of `B`
-    (`a-one-partial-per-digit`) and the user still has to notice the zero.
-  - **unblocks:** `r-posed-layout`, `r-right-to-left-entry`, `a-one-partial-per-digit`,
-    `a-line-length`
-  - **raised by:** the answer to `q-shift-zeros` (the app pre-fills the shifted zeros,
-    which leaves a zero line almost all written)
-  - **answer:** (a): "Type a single 0 (Recommended)" (2026-09-22, in the conversation)
+None open.
