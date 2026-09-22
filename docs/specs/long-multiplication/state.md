@@ -135,7 +135,7 @@ Nothing placed yet.
     `settings.gradle.kts`, `r-docker-build`
   - **raised by:** the answer to `q-validation` (the JVM unit tests run per module) and the
     answer to `q-other-operations` (one operation, one arithmetic)
-  - **answer:**
+  - **answer:** (a): "multiplication + app (Recommended)" (2026-09-22, in the conversation)
 - **`q-screen-layout`** — How are the screens laid out? (Drawings shown in the
   conversation.)
   - **options:**
@@ -152,7 +152,7 @@ Nothing placed yet.
   - **raised by:** the answer to `q-digit-range` (6 digits sets the widest layout), the
     answer to `q-error-feedback` (the Try again button needs a place), and
     `a-mockup-before-layout`
-  - **answer:**
+  - **answer:** (a): "One screen (Recommended)", chosen on a drawing of a 3-digit problem: count buttons [2]–[6] on top, the posed multiplication with greyed pre-filled zeros in the middle, the keypad [7 8 9 / 4 5 6 / 1 2 3 / ⌫ 0 Enter] at the bottom (2026-09-22, in the conversation)
 - **`q-back-to-line`** — Can the user go back to a line they already ended with Enter?
   - **options:**
     - (a) Yes: erase on an empty line goes back to the end of the previous line
@@ -162,7 +162,7 @@ Nothing placed yet.
     earlier line should be fixable, and this needs no extra control.
   - **unblocks:** `r-right-to-left-entry`
   - **raised by:** the answer to `q-error-feedback`, "at the end"
-  - **answer:**
+  - **answer:** (a): "Erase goes back (Recommended)" (2026-09-22, in the conversation)
 - **`q-zero-digit`** — When a digit of `B` is 0, its partial product is 0. What happens to
   its line?
   - **options:**
@@ -175,4 +175,4 @@ Nothing placed yet.
     `a-line-length`
   - **raised by:** the answer to `q-shift-zeros` (the app pre-fills the shifted zeros,
     which leaves a zero line almost all written)
-  - **answer:**
+  - **answer:** (a): "Type a single 0 (Recommended)" (2026-09-22, in the conversation)
