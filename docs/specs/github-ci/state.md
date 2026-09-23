@@ -1,10 +1,10 @@
 ---
 idea: github-ci
 chain: trunk
-step: 2
-status: refining
+step: 3
+status: unproved
 waits on: none
-remaining: 0q + 0r + 6i + 2f
+remaining: 1q + 0r + 2i + 1f
 ---
 
 # A CI on GitHub that builds the APK
@@ -21,48 +21,19 @@ Nothing left to refine: `r-ci-builds-apk` became `CAP-ci/github-build`.
 
 ## To land
 
-- **`CAP-ci/github-build`** — Every change pushed to GitHub is built there by a GitHub
-  Actions run, without anyone building on their own machine: the run builds the debug APK,
-  runs the JVM unit tests of every module, and offers the APK for download.
-  - **success:** The commit is pushed to GitHub, the workflow run for it ends green, having
-    built the debug APK and run the JVM unit tests of every module, and the debug APK can be
-    downloaded from the run.
-  - **lands in:** `.github/workflows/SPEC.md`
-  - **held in:** `.github/workflows/build.yml` (the job: check out, run `./build.sh`, upload
-    the debug APK as the run's artifact)
-  - **status:** planned
-- **`INV-ci/one-build-path`** — The workflow builds only by running `./build.sh`, so the CI
-  builds exactly what the host builds: it sets up no JDK, Gradle or Android SDK on the
-  runner, and runs no Gradle command of its own.
-  - **held by:** review, over `.github/workflows/build.yml`
-  - **why:** there stays one way to build, and it cannot drift from the Dockerfile
+- **`LIM-ci/artifact-retention`** — A run offers its APK for GitHub's default artifact
+  retention, 90 days; after that the run no longer offers it, and a fresh one is had by
+  starting the workflow by hand.
+  - **raised by:** review found the run's artifact expires (`expires=2026-12-22`), bounding
+    `CAP-ci/github-build`'s "offers the APK for download", and no claim said so
   - **lands in:** `.github/workflows/SPEC.md`
   - **status:** planned
-- **`INV-ci/fails-on-failure`** — A run fails when the image, the APK or any module's JVM
-  unit test fails to build or pass.
-  - **held by:** review: the build step of `.github/workflows/build.yml` is `./build.sh`,
-    which exits with Docker's status, which is Gradle's
-  - **lands in:** `.github/workflows/SPEC.md`
-  - **status:** planned
-- **`INV-ci/triggers`** — The workflow runs on every push to any branch, on every pull
-  request, and when started by hand.
-  - **held by:** review: the `on:` of `.github/workflows/build.yml` lists `push` and
-    `pull_request` with no branch filter, and `workflow_dispatch`
-  - **why:** every change is built before it is merged, and a fresh APK can be had by hand
-  - **lands in:** `.github/workflows/SPEC.md`
-  - **status:** planned
-- **`REQ-ci/github-repository`** — The repository is pushed to a private GitHub repository,
-  its `origin`, where GitHub Actions runs the workflow on GitHub's hosted Ubuntu runner,
-  which has Docker and reaches the internet, as `REQ-root/docker` and `REQ-root/network`
-  ask of the host.
-  - **held by:** demonstration: `git remote -v` names it, and `gh repo view` shows it
-    private
-  - **made by:** the landing run, with `gh repo create --private --source . --push`, before
-    it demonstrates `CAP-ci/github-build`, without waiting on anyone (`q-repository` (b))
-  - **lands in:** `.github/workflows/SPEC.md`
-  - **status:** planned
-- **`LIM-ci/build-by-run`** — `CAP-ci/github-build` is shown only by pushing a commit and
-  reading its run and the APK it offers; no test runs the workflow.
+- **`LIM-ci/actions-minutes`** — The repository is private, so its runs count against the
+  account's metered GitHub Actions minutes; once they run out, pushes are no longer built
+  until the quota renews.
+  - **raised by:** review found this bounds `CAP-ci/github-build`'s "every change pushed"
+    and `INV-ci/triggers`' "every push", given `REQ-ci/github-repository`'s "private", and
+    no claim said so
   - **lands in:** `.github/workflows/SPEC.md`
   - **status:** planned
 
@@ -77,24 +48,27 @@ Nothing reopened.
 
 ## Assumptions
 
-- **`a-github-actions`** — "a ci (github)" means GitHub Actions: a workflow file under
-  `.github/workflows/`, run on GitHub's hosted runners.
-  - **raised by:** "add a ci (github)"
-  - **bears on:** `CAP-ci/github-build`, `REQ-ci/github-repository`
-- **`a-debug-apk`** — "the apk" is the debug APK, the one `CAP-root/docker-build` builds.
-  A release APK would need a signing key, which the brief does not mention.
-  - **raised by:** "to build the apk"
-  - **bears on:** `CAP-ci/github-build`
+No assumptions left: both landed as the `assumes:` line of `CAP-ci/github-build`.
 
 ## Files
 
-- `.github/workflows/SPEC.md` — holds: `CAP-ci/github-build`, `INV-ci/one-build-path`,
-  `INV-ci/fails-on-failure`, `INV-ci/triggers`, `REQ-ci/github-repository`,
-  `LIM-ci/build-by-run`; declares the namespace `ci` — planned
-- `.github/workflows/build.yml` — holds: `CAP-ci/github-build` (`[provides:]`, and
-  `[uses: CAP-root/docker-build]` on the build step); read by review for
-  `INV-ci/one-build-path`, `INV-ci/fails-on-failure`, `INV-ci/triggers` — planned
+- `.github/workflows/SPEC.md` — holds: `LIM-ci/artifact-retention`, `LIM-ci/actions-minutes`
+  — written in step-3, open for: `LIM-ci/artifact-retention`, `LIM-ci/actions-minutes`
 
 ## Open Questions
 
-No open questions.
+- **`q-ci-limits`** — The CI has two limits nobody decided: a run's APK can be downloaded
+  for 90 days only, and a private repository's Actions minutes are metered, so pushes stop
+  being built once they run out. How are they handled?
+  - **options:**
+    - (a) Admit both as limits, as drafted
+    - (b) Make the repository public: Actions minutes on GitHub's standard hosted runners
+      are then not metered, so `LIM-ci/actions-minutes` is dropped and
+      `REQ-ci/github-repository`'s "private" is reopened; `LIM-ci/artifact-retention` is
+      admitted
+  - **recommended:** (a), because the CI then keeps the private repository you chose, and
+    a four-minute run leaves the free quota far from reach for one person's pushes
+  - **unblocks:** `LIM-ci/artifact-retention`, `LIM-ci/actions-minutes`,
+    `.github/workflows/SPEC.md`
+  - **raised by:** the review of this step's landing, which found both limits unstated
+  - **answer:**

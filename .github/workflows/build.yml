@@ -1,0 +1,25 @@
+# [provides: CAP-ci/github-build] builds every change pushed to GitHub, runs every module's
+# JVM unit tests, and offers the debug APK for download from the run.
+name: build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # [uses: CAP-root/docker-build] the host's one build command, run as it is, so the
+      # run fails whenever the image, the APK or a unit test does.
+      - run: ./build.sh
+
+      # [provides: CAP-ci/github-build] the APK the run offers for download.
+      - uses: actions/upload-artifact@v7
+        with:
+          name: app-debug
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
