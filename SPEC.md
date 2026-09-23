@@ -16,6 +16,26 @@ Docker, and accepts modules: each top-level directory recognized below is one.
   - **assumes:** the host has no JDK and no Android SDK, and none is installed on it; the
     image carries both, and Gradle, so there is no Gradle wrapper. The APK is installed on
     the Android Studio emulator on Windows through `adb`.
+- **`CAP-root/debug-key`** — When `DEBUG_KEYSTORE` holds a base64-encoded keystore,
+  `./build.sh` signs the debug APK with it, so every build given the same keystore installs
+  over the last without uninstalling; when it is unset or empty, the APK is signed with
+  Android's default debug key, as now.
+  - **success:** The `.apk` of a second push's release installs by hand on a real phone over
+    the first's, without uninstalling.
+  - **assumes:** the key reaches the build only through `./build.sh`; without it, as on
+    this host or for a pull request from a fork, the build is what it was, signed with
+    Android's default debug key; the keystore is written as Android's default debug
+    keystore, `debug.keystore` under the build's `ANDROID_USER_HOME`
+    (`.gradle/android-home/`), so no Gradle file changes and the keystore uses Android's
+    debug defaults.
+- **`CAP-root/readme`** — A friend opening the repository on GitHub reads in a few words
+  what the app is, sees a screenshot, finds a link that downloads the latest APK, and reads
+  how to install an APK from outside the Play Store.
+  - **success:** The README, as GitHub shows it, says what the app is, shows the screenshot,
+    and says how to install an APK from outside the Play Store; its link downloads the
+    latest `.apk`, which installs by hand on a real phone.
+  - **assumes:** the README is written in English, like the app's screen; the link names
+    the release's `mental-arithmetic.apk`.
 
 ## Contract
 
@@ -33,6 +53,11 @@ Docker, and accepts modules: each top-level directory recognized below is one.
   - **held by:** review, over every module's `build.gradle.kts`
   - **why:** a set of build files has no JVM unit test to show it
 
+## Non-goals
+
+- **`NOT-root/signing-key-in-repo`** — No keystore is committed: the signing key lives only
+  in the GitHub secret, and a build writes it under the gitignored `.gradle/`.
+
 ## Requires
 
 - **`REQ-root/docker`** — The host has Docker (28.5 is the version the build is run with),
@@ -44,3 +69,6 @@ Docker, and accepts modules: each top-level directory recognized below is one.
 
 - **`LIM-root/build-by-run`** — `CAP-root/docker-build` is shown only by running
   `./build.sh` on the host and reading its result; no test runs the build.
+- **`LIM-root/shown-by-hand`** — `CAP-root/debug-key` and `CAP-root/readme` are shown only
+  by hand: installing a release's `.apk` over the one before on a real phone, and reading
+  the README on GitHub; no test runs them.

@@ -10,12 +10,20 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # [provides: CAP-ci/release-on-push] the run's token may publish a release.
+    permissions:
+      contents: write
+    # [provides: CAP-ci/github-build] the build, and the APK offered from the run.
     steps:
       - uses: actions/checkout@v7
 
       # [uses: CAP-root/docker-build] the host's one build command, run as it is, so the
       # run fails whenever the image, the APK or a unit test does.
       - run: ./build.sh
+        # [uses: CAP-root/debug-key] the one key every build given the secret is signed
+        # with, so each release installs over the last.
+        env:
+          DEBUG_KEYSTORE: ${{ secrets.DEBUG_KEYSTORE }}
 
       # [provides: CAP-ci/github-build] the APK the run offers for download.
       - uses: actions/upload-artifact@v7
@@ -23,3 +31,15 @@ jobs:
           name: app-debug
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
+
+      # [provides: CAP-ci/release-on-push] a push to master publishes the APK as a new
+      # release, marked latest, under a fixed name, so the latest-download link never
+      # changes; no other run publishes one.
+      - if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp app/build/outputs/apk/debug/app-debug.apk "$RUNNER_TEMP/mental-arithmetic.apk"
+          gh release create "build-$GITHUB_RUN_NUMBER" "$RUNNER_TEMP/mental-arithmetic.apk" \
+            --target "$GITHUB_SHA" --latest \
+            --title "build $GITHUB_RUN_NUMBER" --notes "Built from $GITHUB_SHA."
