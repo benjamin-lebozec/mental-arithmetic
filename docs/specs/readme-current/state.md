@@ -1,10 +1,10 @@
 ---
 idea: readme-current
 chain: trunk
-step: 2
+step: 3
 status: refining
 waits on: none
-remaining: 2q + 0r + 1i + 3f
+remaining: 4q + 0r + 2i + 3f
 ---
 
 # A README that shows the app as it is now
@@ -21,7 +21,14 @@ Nothing left: the one requirement became the reopened `CAP-root/readme`.
 
 ## To land
 
-Nothing new to land: the one item left is reopened below.
+- **`LIM-root/screenshot-freshness`** — A change to the app's screen brings the README's
+  screenshot into review only when it touches one of the app capabilities the README cites
+  as uses:; a change that touches none of them, such as a new element under a new
+  capability or a change of theme or colour, does not take the screenshot again unless that
+  new capability is added to the README's uses:.
+  - **decided by:** `q-uses-gap`'s answer, "Record a LIM (Recommended)" (2026-09-23)
+  - **lands in:** `SPEC.md`
+  - **status:** planned
 
 ## Reopened
 
@@ -78,47 +85,75 @@ Nothing new to land: the one item left is reopened below.
 
 ## Files
 
-- `SPEC.md` — holds: `CAP-root/readme` (reopened) — planned
+- `SPEC.md` — holds: `CAP-root/readme` (reopened), `LIM-root/screenshot-freshness` — planned
 - `README.md` — holds: `CAP-root/readme` (reopened); its header also cites, as uses:, the
   six app capabilities the screenshot shows; the screenshot's alt text names the scene
-  without operands: "a 3-digit multiplication after the check, with wrong digits in red"
-  — planned
+  without operands: "a 3-digit multiplication after the check, with wrong digits in red";
+  its uses: are not a dependency of the root on `app` under `INV-root/module-dependency`,
+  which governs only modules' `build.gradle.kts`, and the module-contract-reviewer confirms
+  it when the file is written — planned
 - `.github/screenshot.png` — holds: `CAP-root/readme` (reopened), its screenshot — planned
 
 ## Open Questions
 
-- **`q-uses-gap`** — The reopened claim says "a change to how the app's screen looks takes
-  the screenshot again", but the README's uses: name six capabilities. A change to the
-  screen that touches none of them (a new element under a new capability, or a theme or
-  colour change) would not bring the README into review. What should the tree say?
+- **`q-uses-duty`** — `q-uses-gap`'s answer said "a new app capability must add itself to
+  those uses: to be covered". `LIM-root/screenshot-freshness` states it as a condition
+  ("unless that new capability is added"), and no claim makes adding it a duty. Should that
+  duty become a claim?
   - **options:**
-    - (a) record the gap as a `LIM-root/…` in `SPEC.md`: the screenshot is re-checked only
-      when a change touches a capability the README uses, and a new app capability must add
-      itself to those uses: to be covered
-    - (b) narrow the claim's wording to what the uses: catch: a change to any of the six
-      capabilities takes the screenshot again
-    - (c) accept it as it is, and say why
-    - (d) leave it to a new idea, whose brief you write
-  - **recommended:** (a), because it keeps your rule "a graphical change of the main app
-    should always trigger a new screenshot" as the claim, and admits in the open where
-    nothing holds it
-  - **unblocks:** `CAP-root/readme` (reopened), `SPEC.md`
-  - **raised by:** `q-freshness-held`'s answer, applied in step 2; the refinement-prover's
-    "Not my call" in step 2
+    - (a) take it into this chain: a new review-held `INV-root/…` in `SPEC.md`, "every app
+      capability that shapes how the screen looks is cited as uses: in `README.md`"
+    - (b) leave it to a new idea, whose brief you write
+    - (c) accept it as it is: the limit states the gap in the open, and that is enough
+  - **recommended:** (c), because `q-freshness-held` was answered "uses: citations, no INV",
+    and a duty held by review would be that invariant under another name
+  - **unblocks:** `LIM-root/screenshot-freshness`, `SPEC.md`
+  - **raised by:** `q-uses-gap`'s answer, applied in step 3; the refinement-prover's "Not my
+    call" in step 3
   - **answer:**
-- **`q-root-uses-app`** — Does a uses: citation from the root's `README.md` onto app
-  capabilities count as a dependency of the root on `app`, under
-  `INV-root/module-dependency`?
+- **`q-theme-change`** — For a change of theme or colour, the limit's "unless that new
+  capability is added to the README's uses:" has no new capability to refer to. Should the
+  limit say how such a change is ever caught, or that it never is?
   - **options:**
-    - (a) no: `INV-root/module-dependency` governs modules' `build.gradle.kts` only, and the
-      README is prose about the app, not a module; the module-contract-reviewer confirms it
-      when the item lands
-    - (b) yes, and the root contract is reopened to allow it
-    - (c) take the uses: to another place than the README
-    - (d) leave it to a new idea, whose brief you write
-  - **recommended:** (a), because the invariant speaks only of `project(":<name>")`
-    dependencies between modules, and the root builds nothing from the README
-  - **unblocks:** `README.md`
-  - **raised by:** `q-freshness-held`'s answer, applied in step 2; the refinement-prover's
-    "Not my call" in step 2
+    - (a) take it into this chain: reword `LIM-root/screenshot-freshness` so it says that a
+      change of theme or colour that touches none of the six capabilities is never caught
+      by the uses:, and the screenshot is then retaken only by hand
+    - (b) leave it to a new idea, whose brief you write
+    - (c) accept it as it is, and say why
+  - **recommended:** (a), because it makes the limit true of every case it names, at the
+    cost of one clause
+  - **unblocks:** `LIM-root/screenshot-freshness`, `SPEC.md`
+  - **raised by:** `q-uses-gap`'s answer, applied in step 3; the refinement-prover's "Not my
+    call" in step 3
+  - **answer:**
+- **`q-dependency-recorded`** — `q-root-uses-app`'s decision, that the README's uses: are
+  not a dependency under `INV-root/module-dependency`, lives only in the `README.md` Files
+  line and the reviewer's verdict when the file is written, and leaves the plan when it
+  lands. Should it also land in `SPEC.md`, so later reviews over the whole tree see it?
+  - **options:**
+    - (a) take it into this chain: add it to the reopened `CAP-root/readme`'s why: in
+      `SPEC.md`
+    - (b) leave it to a new idea, whose brief you write
+    - (c) accept it as it is: `INV-root/module-dependency` already speaks only of a
+      module's `build.gradle.kts`, so a later review reads the same answer from it
+  - **recommended:** (c), because a second line saying what the invariant's own text says
+    would only repeat the tree
+  - **unblocks:** `CAP-root/readme` (reopened), `README.md`, `SPEC.md`
+  - **raised by:** `q-root-uses-app`'s answer, applied in step 3; the refinement-prover's
+    "Not my call" in step 3
+  - **answer:**
+- **`q-limit-shown`** — A limit is settled once it says how it is held, and
+  `LIM-root/screenshot-freshness` does not; neither do the `LIM-root/…` lines already in
+  `SPEC.md`. Should it gain a line saying how it is shown?
+  - **options:**
+    - (a) take it into this chain: add "shown by: review, reading the README's uses: against
+      the app capabilities that shape the screen" to the limit
+    - (b) leave it to a new idea, whose brief you write
+    - (c) accept it as it is: every `LIM-` is reviewed by demonstration by its kind, as the
+      limits already in `SPEC.md` are
+  - **recommended:** (a), because it costs one line and lets the limit meet `settled` as
+    written, rather than by an exception
+  - **unblocks:** `LIM-root/screenshot-freshness`, `SPEC.md`
+  - **raised by:** `q-uses-gap`'s answer, applied in step 3; the refinement-prover's "Not my
+    call" in step 3
   - **answer:**
