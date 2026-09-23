@@ -1,0 +1,4 @@
+# [provides: CAP-root/docker-build] what the build writes, never committed.
+build/
+.gradle/
+.kotlin/
