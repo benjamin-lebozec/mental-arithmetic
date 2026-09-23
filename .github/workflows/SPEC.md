@@ -48,3 +48,12 @@ builds it, so the APK never has to be built on someone's own machine.
 
 - **`LIM-ci/build-by-run`** — `CAP-ci/github-build` is shown only by pushing a commit and
   reading its run and the APK it offers; no test runs the workflow.
+- **`LIM-ci/artifact-retention`** — A run offers its APK for GitHub's default artifact
+  retention, 90 days; after that the run no longer offers it, and a fresh one is had by
+  starting the workflow by hand.
+  - **held by:** demonstration: `gh api` lists the run's artifact with an `expires_at` 90
+    days after the run started
+- **`LIM-ci/actions-minutes`** — The repository is private, so its runs count against the
+  account's metered GitHub Actions minutes; once they run out, pushes are no longer built
+  until the quota renews.
+  - **held by:** demonstration: `gh repo view` shows the repository private

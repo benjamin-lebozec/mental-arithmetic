@@ -1,10 +1,10 @@
 ---
 idea: github-ci
 chain: trunk
-step: 4
-status: refining
+step: 5
+status: done
 waits on: none
-remaining: 0q + 0r + 2i + 1f
+remaining: 0q + 0r + 0i + 0f
 ---
 
 # A CI on GitHub that builds the APK
@@ -21,24 +21,8 @@ Nothing left to refine: `r-ci-builds-apk` became `CAP-ci/github-build`.
 
 ## To land
 
-- **`LIM-ci/artifact-retention`** — A run offers its APK for GitHub's default artifact
-  retention, 90 days; after that the run no longer offers it, and a fresh one is had by
-  starting the workflow by hand.
-  - **raised by:** review found the run's artifact expires (`expires=2026-12-22`), bounding
-    `CAP-ci/github-build`'s "offers the APK for download", and no claim said so
-  - **held by:** demonstration: `gh api` lists the run's artifact with an `expires_at` 90
-    days after its `created_at`
-  - **lands in:** `.github/workflows/SPEC.md`
-  - **status:** planned
-- **`LIM-ci/actions-minutes`** — The repository is private, so its runs count against the
-  account's metered GitHub Actions minutes; once they run out, pushes are no longer built
-  until the quota renews.
-  - **raised by:** review found this bounds `CAP-ci/github-build`'s "every change pushed"
-    and `INV-ci/triggers`' "every push", given `REQ-ci/github-repository`'s "private", and
-    no claim said so
-  - **held by:** demonstration: `gh repo view` shows the repository private
-  - **lands in:** `.github/workflows/SPEC.md`
-  - **status:** planned
+Nothing left to land: `LIM-ci/artifact-retention` and `LIM-ci/actions-minutes` landed in
+step-5.
 
 ## Reopened
 
@@ -55,8 +39,7 @@ No assumptions left: both landed as the `assumes:` line of `CAP-ci/github-build`
 
 ## Files
 
-- `.github/workflows/SPEC.md` — holds: `LIM-ci/artifact-retention`, `LIM-ci/actions-minutes`
-  — written in step-3, open for: `LIM-ci/artifact-retention`, `LIM-ci/actions-minutes`
+No files left: `.github/workflows/SPEC.md` closed in step-5.
 
 ## Open Questions
 
