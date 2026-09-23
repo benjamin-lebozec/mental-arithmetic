@@ -278,10 +278,7 @@ Success signal left:
 - every success signal is shown by a capability landed in this chain;
 - every claim this chain landed without code (non-goals, requirements, limits, review-held
   invariants) is recorded as true of the tree by the `module-contract-reviewer`, in the
-  step that landed it or in this one;
-- every "Not my call" line either agent gave in this chain is quoted in a step's Reviews,
-  and the question it became has an answer in a step's Changes. A "Not my call" line the
-  prover itself gives in this step, that the step does not quote, fails this obligation.
+  step that landed it or in this one.
 
 For a trunk that split, every branch's plan is also `done`. *(B: the implementation is the
 last refinement.)*

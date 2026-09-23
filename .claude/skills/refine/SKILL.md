@@ -166,14 +166,6 @@ say. If the next run would need it, write it:
    Stop after three rounds. Do not overrule the prover: if you think a verdict is wrong,
    record it with your reason, and put it to the user.
 
-   Each line either agent gives under "Not my call" is the user's decision, never yours:
-   do not fix it, do not relabel it, do not drop it because it is outside the chain's
-   files. Quote it word for word in the step's Reviews, naming the agent, and add it to the
-   plan as an open question, with the options: (a) take it into this chain, as a reopened
-   item or a new one, and its file into Files; (b) leave it to a new idea, whose brief the
-   user writes; (c) accept it as it is, and say why. It counts in `remaining` like any
-   question, so the chain cannot reach `done` while it is unanswered.
-
 6. **Record the proof** in the step: the review, the demonstrations, the prover's verdicts
    (on each Changes entry, and one line per obligation), and the re-proof's outcome. Then
    set the plan's `status`:
@@ -191,8 +183,7 @@ say. If the next run would need it, write it:
      not `discharged`;
    - each item settled and landed in this step under standing authorization, with the
      answers it rests on, since this review is the first time the user sees it;
-   - any verdict you disputed, with your reason;
-   - each "Not my call" line, quoted, and the question it became.
+   - any verdict you disputed, with your reason.
 
    Then ask with `AskUserQuestion`: commit as it is (recommended when the proof is clean),
    or "I edited something", or hold off. Wait for the answer. Do not ask the step's
