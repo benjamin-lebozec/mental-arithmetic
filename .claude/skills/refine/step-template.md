@@ -82,7 +82,8 @@ and the counts. Otherwise: "None."}
 
 {The module-contract-reviewer's scope (the change, or the whole tree), its verdicts that
 are not `holds`, the number that are, and what was fixed before proving. Otherwise: "None:
-nothing in the tree changed."}
+nothing in the tree changed." Then each "Not my call" line from either agent, quoted word
+for word with the agent's name, and the plan question it became.}
 
 ## Proof
 

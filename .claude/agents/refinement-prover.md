@@ -158,7 +158,7 @@ clear. Not whether a different refinement would have been better. Not whether th
 correct beyond what its item says. Only whether this is a refinement.
 
 If you notice something outside that, name it in one line at the end under "Not my call",
-and move on.
+and move on. Refine puts each such line to the user as a question.
 
 ## Output
 

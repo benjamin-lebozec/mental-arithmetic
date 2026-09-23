@@ -168,7 +168,10 @@ Not whether the code is correct, fast, safe, idiomatic, or well-structured. Not 
 design is wise or the claim worth making. Not whether a step refines the one before it:
 that is the `refinement-prover`'s.
 
-If you notice a real bug, name it in one line at the end under "Not my call", and move on.
+If you notice a real bug, or something in the tree that no claim covers but that no
+longer matches what it shows, copies or describes (a screenshot, a sample, a comment),
+name it in one line at the end under "Not my call", and move on. Say it plainly and do not
+judge whether it matters: refine puts each such line to the user as a question.
 
 ## Output
 
