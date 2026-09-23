@@ -1,10 +1,10 @@
 ---
 idea: long-multiplication
 chain: trunk
-step: 3
+step: 4
 status: refining
 waits on: none
-remaining: 0q + 1r + 16i + 21f
+remaining: 0q + 1r + 22i + 21f
 ---
 
 # Long multiplication, posed as by hand
@@ -35,6 +35,14 @@ remaining: 0q + 1r + 16i + 21f
   - **status:** planned
 - **`REQ-root/docker`** — The host has Docker (28.5 is the version the build is run with),
   and needs no JDK and no Android SDK.
+  - **lands in:** `SPEC.md`
+  - **status:** planned
+- **`REQ-root/network`** — The host reaches the internet while it builds: the image
+  downloads Gradle and the Android SDK, and Gradle downloads the plugins and libraries.
+  - **lands in:** `SPEC.md`
+  - **status:** planned
+- **`LIM-root/build-by-run`** — `CAP-root/docker-build` is shown only by running
+  `./build.sh` on the host and reading its result; no test runs the build.
   - **lands in:** `SPEC.md`
   - **status:** planned
 - **`INV-root/module-recognized`** — A module is a top-level directory holding a
@@ -80,8 +88,10 @@ remaining: 0q + 1r + 16i + 21f
   - **status:** planned
 - **`CAP-app/pick-digit-count`** — On the one screen, count buttons 2 to 6 sit on top;
   tapping a count, even the current one, poses a new `A` and `B` with that many digits.
-  - **success:** On the Android Studio emulator on Windows, the user taps each count from
-    2 to 6, the current one too, and each tap poses a new `A × B` with that many digits.
+  - **success:** On the Android Studio emulator on Windows, each count from 2 to 6 is
+    tapped through `adb`, the current one too, and the screenshot after each tap shows a
+    new `A × B` with that many digits.
+  - **assumes:** at launch, the count is 2, as if it had been tapped.
   - **lands in:** `app/SPEC.md`
   - **held in:** `app/src/main/kotlin/mentalarithmetic/app/PracticeScreen.kt` (the
     buttons), `app/src/main/kotlin/mentalarithmetic/app/Practice.kt` (the new problem)
@@ -90,8 +100,8 @@ remaining: 0q + 1r + 16i + 21f
   posed as by hand: `A`, `× B`, the partial products added up, then the result, every
   digit aligned in its column, the shifted zeros written in advance and greyed.
   - **success:** On the Android Studio emulator on Windows, for each count from 2 to 6, the
-    user sees `A`, `× B`, one line per digit of `B` and the result line, every digit in its
-    column and the shifted zeros greyed.
+    screenshots taken through `adb` show `A`, `× B`, one line per digit of `B` and the
+    result line, every digit in its column and the shifted zeros greyed.
   - **lands in:** `app/SPEC.md`
   - **held in:** `app/src/main/AndroidManifest.xml`,
     `app/src/main/kotlin/mentalarithmetic/app/MainActivity.kt` (the screen shown at
@@ -102,9 +112,9 @@ remaining: 0q + 1r + 16i + 21f
   starting at the first column left of its greyed zeros. Enter moves to the next line once
   the current one holds a digit. Erase removes the last digit typed, and on an empty line
   goes back to the end of the previous line.
-  - **success:** On the Android Studio emulator on Windows, the user types each partial
-    product and the result right to left with Enter after each, and erases back across a
-    line they already ended.
+  - **success:** On the Android Studio emulator on Windows, each partial product and the
+    result are typed through `adb`, right to left with Enter after each, and erased back
+    across a line already ended, and the screenshots show each digit where it was typed.
   - **lands in:** `app/SPEC.md`
   - **held in:** `app/src/main/kotlin/mentalarithmetic/app/PracticeScreen.kt` (the
     keypad), `app/src/main/kotlin/mentalarithmetic/app/Practice.kt` (the entry)
@@ -112,23 +122,34 @@ remaining: 0q + 1r + 16i + 21f
 - **`CAP-app/check-at-end`** — Once Enter ends the result line, every typed line is
   checked, and the errors are shown: a wrong digit in red, a missing or extra column
   marked.
-  - **success:** On the Android Studio emulator on Windows, the user ends the result line
-    and is shown which digits are wrong, missing or extra.
+  - **success:** On the Android Studio emulator on Windows, the result line is ended through
+    `adb`, and the screenshot shows which digits are wrong, missing or extra.
   - **lands in:** `app/SPEC.md`
   - **held in:** `app/src/main/kotlin/mentalarithmetic/app/Practice.kt` (the check),
     `app/src/main/kotlin/mentalarithmetic/app/PracticeScreen.kt` (the marks)
   - **status:** planned
 - **`CAP-app/try-again`** — After the check, a Try again button takes Enter's place;
   tapping it clears every digit the user typed and poses the same `A` and `B` again.
-  - **success:** On the Android Studio emulator on Windows, after the check, the user taps
-    Try again, their digits are cleared, and `A` and `B` are unchanged.
+  - **success:** On the Android Studio emulator on Windows, after the check, Try again is
+    tapped through `adb`, and the screenshot shows the typed digits cleared and `A` and `B`
+    unchanged.
   - **lands in:** `app/SPEC.md`
   - **held in:** `app/src/main/kotlin/mentalarithmetic/app/Practice.kt` (the reset),
     `app/src/main/kotlin/mentalarithmetic/app/PracticeScreen.kt` (the button)
   - **status:** planned
+- **`INV-app/portrait-only`** — The screen stays upright: rotating the device neither turns
+  it nor loses the practice in progress.
+  - **held by:** review: the manifest locks the activity to portrait, and declares that it
+    handles size changes itself, so a rotation, even letterboxed, does not recreate it
+  - **lands in:** `app/SPEC.md`
+  - **status:** planned
 - **`REQ-app/arithmetic`** — The app needs `CAP-multiplication/draw-operands`,
   `CAP-multiplication/partial-products` and `CAP-multiplication/check-lines`, through a
   project dependency on `multiplication`.
+  - **lands in:** `app/SPEC.md`
+  - **status:** planned
+- **`REQ-app/emulator-adb`** — This host reaches the Android Studio emulator on Windows
+  through the Windows SDK's `adb.exe`, run from WSL.
   - **lands in:** `app/SPEC.md`
   - **status:** planned
 - **`NOT-app/other-operations`** — The app poses no operation but multiplication; other
@@ -139,8 +160,23 @@ remaining: 0q + 1r + 16i + 21f
   Enter ends the result line.
   - **lands in:** `app/SPEC.md`
   - **status:** planned
-- **`LIM-app/screens-by-manual-review`** — Every capability of the app is shown only by the
-  user's review on the Android Studio emulator on Windows; no test drives the screen.
+- **`LIM-app/screens-by-manual-review`** — Every capability of the app is shown only by a
+  review of the running app on the Android Studio emulator on Windows: the APK is
+  installed, the screen tapped and captured through that emulator's `adb`, and the
+  screenshots judged. No test drives the screen, and nobody but the reviewer of those
+  screenshots judges it.
+  - **lands in:** `app/SPEC.md`
+  - **status:** planned
+- **`LIM-app/practice-lost-when-killed`** — If Android ends the app, or recreates its
+  screen for a change other than a rotation (dark mode, language, font size), the practice
+  in progress is lost, and a new `A × B` is posed.
+  - **lands in:** `app/SPEC.md`
+  - **status:** planned
+- **`LIM-app/hidden-when-sideways`** — Held sideways, the app is shown upright in a
+  letterbox too short for the multiplication, which is hidden until the device is turned
+  upright again, the practice kept: `CAP-app/posed-layout`, the lines typed under
+  `CAP-app/right-to-left-entry`, the marks of `CAP-app/check-at-end`, and what
+  `CAP-app/pick-digit-count` and `CAP-app/try-again` pose hold only while it is upright.
   - **lands in:** `app/SPEC.md`
   - **status:** planned
 
@@ -150,13 +186,13 @@ Nothing reopened.
 
 ## Success signal
 
-- **`s-practised-on-emulator`** — On the Android Studio emulator on Windows, the user
-  installs the APK the Docker build produced, picks a digit count from 2 to 6, and is shown
-  `A × B` posed by hand, every digit aligned and the shifted zeros greyed. They type each
-  partial product and the result right to left, with Enter after each line, are shown at
-  the end which digits are wrong, and Try again clears their digits and keeps `A` and `B`.
-  The user judges each screen there, so every screen criterion lands with a limit saying it
-  is shown only by manual review.
+- **`s-practised-on-emulator`** — On the Android Studio emulator on Windows, the APK the
+  Docker build produced is installed through `adb`, a digit count from 2 to 6 is picked,
+  and `A × B` is shown posed by hand, every digit aligned and the shifted zeros greyed. Each
+  partial product and the result are typed right to left, with Enter after each line, the
+  end shows which digits are wrong, and Try again clears the digits and keeps `A` and `B`.
+  Claude drives the app through `adb` and judges each screen from its screenshots, so every
+  screen criterion lands with a limit saying it is shown only by that review.
 - **`s-unit-tests-in-docker`** — The JVM unit tests of every module pass when run in the
   Docker build.
 
@@ -207,8 +243,8 @@ Nothing reopened.
     before the end, so Enter cannot refuse a line for its length
   - **bears on:** `CAP-app/right-to-left-entry`, `CAP-multiplication/check-lines`
 - **`a-apk-to-windows`** — The Docker build writes the APK into the repository's build
-  output, which the user reaches from Windows through `\\wsl$` and installs by dragging it
-  onto the emulator.
+  output, from which it is installed on the Android Studio emulator on Windows through
+  `adb`.
   - **raised by:** the answer to `q-validation`
   - **bears on:** `CAP-root/docker-build`, `s-practised-on-emulator`
 - **`a-contract-by-review`** — The root Contract's rules are held by review, not by a
@@ -220,7 +256,9 @@ Nothing reopened.
   with the Android command-line tools and Gradle 8.10.2 installed at image build, with
   Android Gradle Plugin 8.7.3, Kotlin 2.1.0 and its Compose compiler plugin, the Compose
   BOM 2024.12.01, compileSdk and targetSdk 35, minSdk 26, and JUnit 4.13.2 for the JVM
-  tests. There is no Gradle wrapper: the image carries Gradle.
+  tests. The image installs build-tools 34.0.0, the version Android Gradle Plugin 8.7.3
+  asks for, and the app hosts Compose with `activity-compose` 1.9.3. There is no Gradle
+  wrapper: the image carries Gradle.
   - **raised by:** the answer to `q-modules` (a Gradle build of two modules) and
     `a-toolchain`
   - **bears on:** `CAP-root/docker-build`
@@ -236,8 +274,9 @@ Nothing reopened.
 
 ## Files
 
-- `SPEC.md` — holds: `CAP-root/docker-build`, `REQ-root/docker`,
-  `INV-root/module-recognized`, `INV-root/module-dependency` — planned
+- `SPEC.md` — holds: `CAP-root/docker-build`, `REQ-root/docker`, `REQ-root/network`,
+  `LIM-root/build-by-run`, `INV-root/module-recognized`, `INV-root/module-dependency` —
+  planned
 - `Dockerfile` — holds: `CAP-root/docker-build` — planned
 - `build.sh` — holds: `CAP-root/docker-build` — planned
 - `settings.gradle.kts` — holds: `CAP-root/docker-build` — planned
@@ -261,10 +300,13 @@ Nothing reopened.
   `CAP-multiplication/check-lines` (demonstrates) — planned
 - `app/SPEC.md` — holds: `CAP-app/pick-digit-count`, `CAP-app/posed-layout`,
   `CAP-app/right-to-left-entry`, `CAP-app/check-at-end`, `CAP-app/try-again`,
-  `REQ-app/arithmetic`, `NOT-app/other-operations`, `NOT-app/check-while-typing`,
-  `LIM-app/screens-by-manual-review` — planned
+  `INV-app/portrait-only`, `REQ-app/arithmetic`, `REQ-app/emulator-adb`,
+  `NOT-app/other-operations`, `NOT-app/check-while-typing`,
+  `LIM-app/screens-by-manual-review`, `LIM-app/practice-lost-when-killed`,
+  `LIM-app/hidden-when-sideways` — planned
 - `app/build.gradle.kts` — holds: `CAP-root/docker-build` — planned
-- `app/src/main/AndroidManifest.xml` — holds: `CAP-app/posed-layout` — planned
+- `app/src/main/AndroidManifest.xml` — holds: `CAP-app/posed-layout`,
+  `INV-app/portrait-only` (held by review) — planned
 - `app/src/main/kotlin/mentalarithmetic/app/MainActivity.kt` — holds:
   `CAP-app/posed-layout` — planned
 - `app/src/main/kotlin/mentalarithmetic/app/PracticeScreen.kt` — holds:
