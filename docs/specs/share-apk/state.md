@@ -1,10 +1,10 @@
 ---
 idea: share-apk
 chain: trunk
-step: 2
+step: 3
 status: refining
 waits on: none
-remaining: 1q + 0r + 10i + 6f
+remaining: 0q + 0r + 10i + 6f
 ---
 
 # Share the APK with friends through GitHub
@@ -46,7 +46,10 @@ Nothing left: each is now an item to land.
   in the repository.
   - **held by:** demonstration: `gh secret list` names `DEBUG_KEYSTORE`
   - **lands in:** `.github/workflows/SPEC.md`
-  - **status:** planned
+  - **status:** planned; settled by `q-signing-key`: the keystore is made with `keytool` in
+    the build image, with Android's debug defaults; the secret is set from it with
+    `gh secret set`, and the user keeps a copy outside the repository, so the secret can be
+    restored if it is lost; it lands once `gh secret list` names `DEBUG_KEYSTORE`
 - **`LIM-ci/release-by-hand`** — `CAP-ci/release-on-push` is shown only by pushing to
   `master`, reading the release, and installing its `.apk` by hand on a real phone; no test
   runs the release.
@@ -177,17 +180,4 @@ Nothing left: each is now an item to land.
 
 ## Open Questions
 
-- **`q-signing-key`** — Who creates the fixed debug keystore and its secret, and is a copy
-  kept?
-  - **options:**
-    - (a) the next run creates it with `keytool` inside the build image, with Android's
-      debug defaults, sets the `DEBUG_KEYSTORE` secret with `gh secret set`, and leaves the
-      keystore in the scratchpad for you to keep outside the repository
-    - (b) you create it and set the secret yourself, from commands the next run gives you
-    - (c) as (a), but no copy is kept: if the secret is ever lost, friends uninstall once
-  - **recommended:** (a), because it needs nothing from you but keeping a file, and the
-    copy lets the key be restored if the secret is lost
-  - **unblocks:** `REQ-ci/debug-key-secret`, `CAP-ci/release-on-push`, `CAP-root/debug-key`
-  - **raised by:** the answer to `q-apk-variant`: a fixed debug keystore must exist and be
-    put in the secret
-  - **answer:**
+No open questions.
