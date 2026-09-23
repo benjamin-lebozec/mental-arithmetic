@@ -29,13 +29,21 @@ Docker, and accepts modules: each top-level directory recognized below is one.
     (`.gradle/android-home/`), so no Gradle file changes and the keystore uses Android's
     debug defaults.
 - **`CAP-root/readme`** — A friend opening the repository on GitHub reads in a few words
-  what the app is, sees a screenshot, finds a link that downloads the latest APK, and reads
-  how to install an APK from outside the Play Store.
-  - **success:** The README, as GitHub shows it, says what the app is, shows the screenshot,
-    and says how to install an APK from outside the Play Store; its link downloads the
-    latest `.apk`, which installs by hand on a real phone.
+  what the app is, sees a screenshot of it, finds a link that downloads the latest APK, and
+  reads how to install an APK from outside the Play Store; the words and the screenshot show
+  the app as it is now, and a change to how the app's screen looks takes the screenshot
+  again.
+  - **success:** The README, as GitHub shows it, says what the app is, shows a screenshot of
+    the app's screen as it is now, and says how to install an APK from outside the Play
+    Store; its link downloads the latest `.apk`, which installs by hand on a real phone.
+  - **why:** the README cites, as uses:, the six app capabilities its screenshot shows,
+    `CAP-app/pick-digit-count`, `CAP-app/new-pair`, `CAP-app/posed-layout`,
+    `CAP-app/right-to-left-entry`, `CAP-app/check-at-end` and `CAP-app/try-again`, so a
+    change to any of them brings the README into that change's review.
   - **assumes:** the README is written in English, like the app's screen; the link names
-    the release's `mental-arithmetic.apk`.
+    the release's `mental-arithmetic.apk`; the screenshot shows a 3-digit multiplication
+    after the check, with wrong digits in red, taken on the Android Studio emulator through
+    `adb`.
 
 ## Contract
 
@@ -72,3 +80,11 @@ Docker, and accepts modules: each top-level directory recognized below is one.
 - **`LIM-root/shown-by-hand`** — `CAP-root/debug-key` and `CAP-root/readme` are shown only
   by hand: installing a release's `.apk` over the one before on a real phone, and reading
   the README on GitHub; no test runs them.
+- **`LIM-root/screenshot-freshness`** — A change to the app's screen brings the README's
+  screenshot into review only when it touches one of the app capabilities the README cites
+  as uses:; a change that touches none of them does not take the screenshot again. A new
+  element under a new capability is caught only once that capability is added to the
+  README's uses:; a change of theme or colour that touches none of them is never caught by
+  the uses:, and the screenshot is then retaken only by hand.
+  - **shown by:** review, reading the README's uses: against the app capabilities that shape
+    the screen
