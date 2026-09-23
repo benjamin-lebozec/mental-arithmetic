@@ -1,10 +1,10 @@
 ---
 idea: readme-current
 chain: trunk
-step: 4
+step: 5
 status: refining
 waits on: none
-remaining: 1q + 0r + 2i + 3f
+remaining: 3q + 0r + 2i + 3f
 ---
 
 # A README that shows the app as it is now
@@ -101,22 +101,43 @@ Nothing left: the one requirement became the reopened `CAP-root/readme`.
 
 ## Open Questions
 
-- **`q-cap-reads-with-limit`** — The reopened `CAP-root/readme`'s will-say reads as
-  unconditional: "a change to how the app's screen looks takes the screenshot again".
-  `LIM-root/screenshot-freshness` now says a change of theme or colour is never caught by the
-  uses:, and the screenshot is then retaken only by hand. Should the capability's wording say
-  so, so that the claim and its limit read together?
+- **`q-status-recorded`** — While step 5 was being proved, its record said
+  `status: refining → refining` and the plan on disk still said `unproved`, the mark a plan
+  carries until its proof is recorded. The plan now says `refining`, as the record does. Is
+  anything more to be done about it?
   - **options:**
-    - (a) take it into this chain: the reopened will-say ends "…and a change to how the app's
-      screen looks takes the screenshot again, by hand when it touches none of the README's
-      uses:"
+    - (a) take it into this chain: a later step records the drafting mark as well, for example
+      `refining → unproved → refining`
+    - (b) leave it to a new idea about how steps record status, whose brief you write
+    - (c) accept it as it is: `unproved` is only the mark a run carries until its proof is
+      recorded, and the plan and the record agree once it is
+  - **recommended:** (c), because the two now agree, and the front matter is outside what the
+    prover matches
+  - **unblocks:** nothing in the plan: it concerns only step 5's record
+  - **raised by:** the refinement-prover's "Not my call" in step 5
+  - **answer:**
+- **`q-no-question-left`** — Step 5's record says "With no question left, the reopened
+  `CAP-root/readme`, the limit and the three files … are settled", but `q-status-recorded` is
+  open. The conclusion holds, since that question unblocks nothing; the sentence is loose.
+  - **options:**
+    - (a) take it into this chain: a later step records that the sentence should have read
+      "with no question left that they wait on"
     - (b) leave it to a new idea, whose brief you write
-    - (c) accept it as it is: a `LIM-` beside a claim is exactly where the claim is not held,
-      and the two already read together in `SPEC.md`
-  - **recommended:** (c), because saying the gap inside the capability would repeat the limit,
-    and every other `CAP-`/`LIM-` pair in `SPEC.md` is written that way
-  - **unblocks:** `CAP-root/readme` (reopened), `SPEC.md`, `README.md`,
-    `.github/screenshot.png`
-  - **raised by:** `q-theme-change`'s answer, applied in step 4; the refinement-prover's "Not
-    my call" in step 4
+    - (c) accept it as it is: a committed step is never edited, and the plan, where no open
+      question lists those items, already says they are settled
+  - **recommended:** (c), because the plan is what the next run reads, and it is right
+  - **unblocks:** nothing in the plan: it concerns only step 5's record
+  - **raised by:** the refinement-prover's "Not my call" in step 5, round 2
+  - **answer:**
+- **`q-status-when-set`** — Step 5's Reviews and `q-status-recorded` say the plan's status
+  was set to `refining` "as the proof was recorded", but the Proof section was still empty
+  when it was set, so the order they describe is not the order it happened in.
+  - **options:**
+    - (a) take it into this chain: a later step records the order as it was
+    - (b) leave it to a new idea about when a run sets the plan's status, whose brief you write
+    - (c) accept it as it is: the status and the proof are committed together, so no committed
+      state ever shows one without the other
+  - **recommended:** (c), because only the committed state is ever read
+  - **unblocks:** nothing in the plan: it concerns only step 5's record
+  - **raised by:** the refinement-prover's "Not my call" in step 5, round 2
   - **answer:**
