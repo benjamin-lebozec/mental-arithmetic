@@ -8,10 +8,23 @@ docker build -t mental-arithmetic-build .
 
 # [provides: CAP-root/debug-key] a keystore given base64-encoded in DEBUG_KEYSTORE is put
 # where Android's build looks for its debug keystore, so the APK is signed with it; unset or
-# empty, Android's default debug key signs the APK.
+# empty, Android's default debug key signs the APK. The default key is set aside and put
+# back on exit, even an interrupted one, so a later build without the variable is signed
+# with it again. A default key a killed build left set aside is put back first.
+keystore=.gradle/android-home/debug.keystore
+if [ -e "$keystore.default" ]; then
+  mv -f "$keystore.default" "$keystore"
+fi
 if [ -n "${DEBUG_KEYSTORE:-}" ]; then
   mkdir -p .gradle/android-home
-  printf '%s' "$DEBUG_KEYSTORE" | base64 -d > .gradle/android-home/debug.keystore
+  if [ -e "$keystore" ]; then
+    mv "$keystore" "$keystore.default"
+    trap 'mv -f "$keystore.default" "$keystore"' EXIT
+  else
+    trap 'rm -f "$keystore"' EXIT
+  fi
+  trap 'exit 130' INT TERM
+  printf '%s' "$DEBUG_KEYSTORE" | base64 -d > "$keystore"
 fi
 
 # [provides: CAP-root/docker-build] the container runs as the host user, so the APK it

@@ -1,3 +1,5 @@
+<!-- [provides: CAP-root/readme] what the app is, how it looks, where to download it and
+how to install it, for a friend opening the repository on GitHub. -->
 # Mental arithmetic
 
 An Android app for practising multiplication the way it is done by hand. Pick how many
