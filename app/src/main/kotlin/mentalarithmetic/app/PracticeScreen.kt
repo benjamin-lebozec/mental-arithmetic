@@ -68,6 +68,21 @@ private fun CountButtons(practice: Practice) {
                 OutlinedButton(onClick, modifier) { Text("$digits") }
             }
         }
+        NewButton(practice, Modifier.weight(1f))
+    }
+}
+
+// [provides: CAP-app/new-pair] at the end of the count row, New poses a new A × B with the
+// current digit count, at any time, while typing or after the check.
+// [uses: CAP-app/pick-digit-count]
+@Composable
+private fun NewButton(practice: Practice, modifier: Modifier) {
+    OutlinedButton(
+        { practice.pickDigitCount(practice.digitCount) },
+        modifier,
+        contentPadding = PaddingValues(horizontal = 4.dp),
+    ) {
+        Text("New", maxLines = 1, softWrap = false)
     }
 }
 
@@ -175,12 +190,12 @@ private fun GridCell(cell: Cell?, width: Dp) {
     }
 }
 
-// [provides: CAP-app/right-to-left-entry] the keypad: 7 8 9 / 4 5 6 / 1 2 3 / ⌫ 0 Enter.
+// [provides: CAP-app/right-to-left-entry] the keypad: 1 2 3 / 4 5 6 / 7 8 9 / ⌫ 0 Enter.
 @Composable
 private fun Keypad(practice: Practice) {
     val typing = !practice.checked
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        for (row in listOf(listOf(7, 8, 9), listOf(4, 5, 6), listOf(1, 2, 3))) {
+        for (row in listOf(listOf(1, 2, 3), listOf(4, 5, 6), listOf(7, 8, 9))) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 for (digit in row) Key("$digit", typing, Modifier.weight(1f)) { practice.typeDigit(digit) }
             }

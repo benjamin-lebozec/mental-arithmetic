@@ -46,7 +46,7 @@ class Practice(private val random: Random = Random.Default) {
 
     // [provides: CAP-app/right-to-left-entry] each line is typed rightmost digit first; Enter
     // needs a digit on the line; erase on an empty line goes back to the previous one. After
-    // the check, digits and erase do nothing until Try again or a count is picked.
+    // the check, digits and erase do nothing until Try again, a count or New is tapped.
     fun typeDigit(digit: Int) {
         if (checked) return
         typed = typed.dropLast(1) + listOf(typed.last() + digit)
