@@ -1,10 +1,10 @@
 ---
 idea: github-ci
 chain: trunk
-step: 3
-status: unproved
+step: 4
+status: refining
 waits on: none
-remaining: 1q + 0r + 2i + 1f
+remaining: 0q + 0r + 2i + 1f
 ---
 
 # A CI on GitHub that builds the APK
@@ -26,6 +26,8 @@ Nothing left to refine: `r-ci-builds-apk` became `CAP-ci/github-build`.
   starting the workflow by hand.
   - **raised by:** review found the run's artifact expires (`expires=2026-12-22`), bounding
     `CAP-ci/github-build`'s "offers the APK for download", and no claim said so
+  - **held by:** demonstration: `gh api` lists the run's artifact with an `expires_at` 90
+    days after its `created_at`
   - **lands in:** `.github/workflows/SPEC.md`
   - **status:** planned
 - **`LIM-ci/actions-minutes`** — The repository is private, so its runs count against the
@@ -34,6 +36,7 @@ Nothing left to refine: `r-ci-builds-apk` became `CAP-ci/github-build`.
   - **raised by:** review found this bounds `CAP-ci/github-build`'s "every change pushed"
     and `INV-ci/triggers`' "every push", given `REQ-ci/github-repository`'s "private", and
     no claim said so
+  - **held by:** demonstration: `gh repo view` shows the repository private
   - **lands in:** `.github/workflows/SPEC.md`
   - **status:** planned
 
@@ -57,18 +60,4 @@ No assumptions left: both landed as the `assumes:` line of `CAP-ci/github-build`
 
 ## Open Questions
 
-- **`q-ci-limits`** — The CI has two limits nobody decided: a run's APK can be downloaded
-  for 90 days only, and a private repository's Actions minutes are metered, so pushes stop
-  being built once they run out. How are they handled?
-  - **options:**
-    - (a) Admit both as limits, as drafted
-    - (b) Make the repository public: Actions minutes on GitHub's standard hosted runners
-      are then not metered, so `LIM-ci/actions-minutes` is dropped and
-      `REQ-ci/github-repository`'s "private" is reopened; `LIM-ci/artifact-retention` is
-      admitted
-  - **recommended:** (a), because the CI then keeps the private repository you chose, and
-    a four-minute run leaves the free quota far from reach for one person's pushes
-  - **unblocks:** `LIM-ci/artifact-retention`, `LIM-ci/actions-minutes`,
-    `.github/workflows/SPEC.md`
-  - **raised by:** the review of this step's landing, which found both limits unstated
-  - **answer:**
+No open questions: `q-ci-limits` was answered in step-4.
