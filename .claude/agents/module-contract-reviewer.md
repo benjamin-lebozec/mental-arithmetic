@@ -77,7 +77,9 @@ the searches as one Bash command with labelled sections, and pipe long listings 
 - the ids whose declaration a spec's diff adds, alters or retires (a line that only moved,
   or whose wording changed around the id without changing its claim, is not touched);
 - the ids the prompt names;
-- the ids the changed shipped files cite, including through their header citation;
+- the ids the changed shipped files cite, including through their header citation, but not
+  through `[doc:]` alone: a changed file's `[doc:]` citations are checked as D-items, and
+  do not walk the capability over its reach;
 - the ids a retired id's citations still name.
 
 Then the checklist, one numbered item each. Give each item what it checks, where
@@ -89,6 +91,9 @@ Then the checklist, one numbered item each. Give each item what it checks, where
   - the changed shipped files;
   - every file that cites a touched id;
   - every file under a directory whose spec the change added, moved or removed.
+- **D-items, the docs.** One per touched `CAP-` that some file cites with `[doc:]`, over
+  every such file, whether or not the change touched it; and one per `[doc:]` citation in a
+  changed shipped file, over that file.
 - **C-items, the claims.** One item per id to walk, in declaration order, spec by spec:
   - every touched id, **judged over its whole reach**: every file its claim reaches in the
     tree, not only the changed ones;
@@ -136,12 +141,15 @@ There is no script for these; you are what holds them. Each is a search.
 - **path** — a `[provides:]`, `[enforces:]` or `[demonstrates:]` names only an id declared
   in a spec in the citing file's directory or a parent of it.
 - **direction** — `[uses:]` names a declared `CAP-`. The dependencies it creates between
-  modules form no cycle.
-- **kind** — `provides:` and `uses:` name only `CAP-` ids, `enforces:` names only `INV-`
-  ids, and `demonstrates:` names only `CAP-` or `INV-` ids. No `REQ-`, `NOT-` or `LIM-` is
+  modules form no cycle. `[doc:]` names a declared `CAP-` anywhere, and creates no
+  dependency: it is not counted for cycles.
+- **kind** — `provides:`, `uses:` and `doc:` name only `CAP-` ids, `enforces:` names only
+  `INV-` ids, and `demonstrates:` names only `CAP-` or `INV-` ids. No `REQ-`, `NOT-` or `LIM-` is
   cited anywhere. `demonstrates:` appears only in a test file, or a stand-in or fixture
   only tests load, and never in code the application runs. A test file the change adds
-  cites no `provides:`; existing tests keep theirs.
+  cites no `provides:`; existing tests keep theirs. `doc:` is never a file's header
+  citation and covers no lines: a file whose only citation is `doc:` has no header
+  citation.
 - **coverage** — every shipped file carries a header citation. The exempt files are
   `SPEC.md`, `README.md`, and assets whose format cannot carry a comment or whose text must
   stay as published. For an exempt asset, check two things:
@@ -173,6 +181,15 @@ id claims?** Only the way you answer it changes:
 - **`NOT-`** — judged by absence. Name the search and show it came back empty.
 - **`LIM-`** — is the limit real, and still real? Is there an obvious limit the code has
   and the spec does not admit?
+
+### Docs (D-items)
+
+For each touched `CAP-`, read every file that cites it with `[doc:]`; for each changed
+file, read it against each capability it cites with `[doc:]`. Read its words, its pictures
+(look at an image it shows, when the change could alter what it shows) and its samples.
+Does the file still say and show what the capability now is, as the tree does it? A file
+that no longer matches is `broken`, and breaks the review like any claim that does not
+hold: the change is not committed until the file is updated. Say what differs.
 
 ### Additions (A-items)
 

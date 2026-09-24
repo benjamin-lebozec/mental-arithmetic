@@ -377,7 +377,11 @@ step, with its drafter, prover and reviewer, for every settling step it removes.
   - `[demonstrates:]` in a new test file, or a stand-in only tests load, for the capability
     or invariant it shows. A new test never cites `[provides:]`. An existing test that this
     step extends keeps its header, and adds a block citing `[demonstrates:]` over the lines
-    it adds.
+    it adds;
+  - `[doc:]`, beside the header citation, in a file that shows or explains another part's
+    behaviour, for each capability it shows. A capability this step lands or reopens
+    brings every file citing it with `[doc:]` into this step: update what no longer
+    matches.
 
   Every file has a header citation. Nothing names the scaffolding, a step or a plan.
 - **A reopened item lands** by replacing its spec text and updating every file that relied

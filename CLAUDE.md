@@ -134,12 +134,13 @@ cite.**
 
 ## 4. Every line of code answers to a claim on its path
 
-In the comment that explains the code, four forms and no others:
+In the comment that explains the code, five forms and no others:
 
     [provides:     CAP-<namespace>/<name>]   this code is how that capability is kept
     [uses:         CAP-<namespace>/<name>]   this code depends on another part's capability
     [enforces:     INV-<namespace>/<name>]   this code is how that invariant is held
     [demonstrates: CAP-|INV-<namespace>/<name>]   this test is how that claim is shown
+    [doc:          CAP-<namespace>/<name>]   this file shows or explains that capability
 
 **The path rule.** A file may `provide:`, `enforce:` or `demonstrate:` only an id declared
 in a `SPEC.md` on its own path: in its directory or in a parent directory. What a file *is*
@@ -151,6 +152,19 @@ test loads. A test does not hold a rule; it shows the rule is held. Deleting the
 breaks the rule, deleting the test only stops us knowing, so the two never share a form.
 Tests written before this form cite `provides:`; they stay as they are, and every test
 written since cites `demonstrates:`.
+
+**`doc:` is for files that show or explain another part's behaviour**: a README, a
+screenshot's alt text, a sample. Such a shipped file cites with `doc:` each capability it
+shows. It is not a dependency and constrains nothing: the claim stays in its `SPEC.md`. So
+`doc:` may name a `CAP-` declared anywhere, and the no-cycle rule does not count it. It is
+never a file's header citation and covers no lines: the header still cites `provides:`,
+`enforces:`, `uses:` or `demonstrates:`, and `doc:` sits beside it. What it buys is review:
+a change that touches a capability brings every file citing it with `doc:` into that
+review, which asks whether the file still matches it, its words, pictures and samples. A
+file that no longer matches is a finding that breaks the review, like a claim that does not
+hold, and the change is not committed until the file is updated. The reason: a README that
+only `uses:` the app says the wrong thing, and one that cites nothing falls out of date
+unnoticed.
 
 - Every `CAP-` is cited by at least one `provides:`.
 - Every `INV-` held by code is cited by at least one `enforces:`.
@@ -191,6 +205,8 @@ rules by reading:
   - the citation rules (declaration, forward, demonstrated, backward, path, direction, kind,
     coverage, severance), over the changed files and every file citing an id the change
     touches;
+  - every file citing with `doc:` a capability the change touches, against that
+    capability: a file that no longer matches breaks the review;
   - every `SPEC.md` claim the change can reach: each id the change touches, judged over its
     whole reach in the tree; and, for each changed file, each `NOT-`, `INV-` held by review,
     `REQ-` and `LIM-` on its path, judged against that file;
