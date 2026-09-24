@@ -1,10 +1,10 @@
 ---
 idea: doc-citations
 chain: trunk
-step: 1
+step: 2
 status: refining
-waits on: none
-remaining: 4q + 4r + 2i + 2f
+waits on: the method stating `doc:`, a direct edit outside refine
+remaining: 1q + 3r + 2i + 2f
 ---
 
 # Docs that follow the features they show
@@ -20,13 +20,21 @@ remaining: 4q + 4r + 2i + 2f
 
 - **`r-doc-form`** — A fifth citation form, `[doc: CAP-<namespace>/<name>]`, says that the
   file citing it shows or explains that capability to a reader. It is not a dependency, and it
-  constrains nothing: the claim stays in its `SPEC.md`.
+  constrains nothing: the claim stays in its `SPEC.md`. It is never a file's header citation
+  and covers no lines: the header still cites `provides:`, `enforces:`, `uses:` or
+  `demonstrates:`, and `doc:` sits beside it.
+  - **delivered by:** the method, edited directly outside this chain; nothing lands in the
+    tree for it
 - **`r-doc-cite`** — A shipped file that shows or explains another part's behaviour (a
   README, a screenshot's alt text, a sample) cites with `doc:` each capability it shows.
+  - **delivered by:** the method, edited directly outside this chain; in the tree, only the
+    README's citations, under the reopened `CAP-root/readme`
 - **`r-doc-review`** — When a change touches a capability, review reads every file that cites
   it with `doc:`, and asks whether that file still matches it: its words, pictures and
-  samples.
-- **`r-readme-doc`** — The README's six `uses:` citations become `doc:` citations.
+  samples. A file that no longer matches is a finding that breaks the review, like a claim
+  that does not hold: the change is not committed until the file is updated.
+  - **delivered by:** the method, edited directly outside this chain; nothing lands in the
+    tree for it
 
 ## To land
 
@@ -42,6 +50,14 @@ Nothing to land yet.
     review."
   - **change:** the README cites those six capabilities with `doc:`, not as uses:; the
     capability line and its success criterion are unchanged.
+  - **new text:** its **why:** line becomes "the README cites, with doc:, the six app
+    capabilities its screenshot shows, `CAP-app/pick-digit-count`, `CAP-app/new-pair`,
+    `CAP-app/posed-layout`, `CAP-app/right-to-left-entry`, `CAP-app/check-at-end` and
+    `CAP-app/try-again`, so a change to any of them brings the README into that change's
+    review."; the README's six `[uses: …]` become `[doc: …]` on the same ids, beside its
+    `[provides: CAP-root/readme]` header
+  - **waits on:** the method stating `doc:`, since a README citing `doc:` before the method
+    knows the form fails review
   - **authority:** the brief: "the README's six `uses:` become `doc:`"
   - **held in:** `README.md`
   - **status:** planned
@@ -56,6 +72,14 @@ Nothing to land yet.
   - **change:** the limit is stated over the README's `doc:` citations instead of its uses:;
     what it admits is unchanged: a change that touches no cited capability, such as a theme
     or a colour, is still not caught.
+  - **new text:** "A change to the app's screen brings the README's screenshot into review
+    only when it touches one of the app capabilities the README cites with doc:; a change
+    that touches none of them does not take the screenshot again. A new element under a new
+    capability is caught only once that capability is added to the README's doc: citations;
+    a change of theme or colour that touches none of them is never caught by the doc:
+    citations, and the screenshot is then retaken only by hand." with **shown by:** "review,
+    reading the README's doc: citations against the app capabilities that shape the screen"
+  - **waits on:** the method stating `doc:`, landing with `CAP-root/readme`
   - **authority:** the brief: "a change that touches no cited capability (a theme, a colour)
     is still not caught; that stays a known limit"
   - **held in:** none (a limit, reviewed by demonstration)
@@ -63,7 +87,10 @@ Nothing to land yet.
 
 ## Success signal
 
-Nothing yet: it waits on `q-validation`.
+- **`s-doc-review`** — In a scratch copy of the tree, a change to the declaration of one
+  capability the README cites with `doc:` (say `CAP-app/posed-layout`) is reviewed, and the
+  review lists the README and judges whether it still matches that capability; and a search
+  shows the README carries six `doc:` citations and no `uses:`.
 
 ## Assumptions
 
@@ -75,69 +102,29 @@ Nothing yet: it waits on `q-validation`.
 - **`a-readme-only`** — Today the README is the only shipped file that shows or explains
   another part's behaviour, so it is the only file that gains `doc:` citations.
   - **raised by:** `r-doc-cite`
-  - **bears on:** `r-doc-cite`, `r-readme-doc`
+  - **bears on:** `r-doc-cite`, `CAP-root/readme` (reopened)
 
 ## Files
 
-- `README.md` — holds: `CAP-root/readme` (reopened), and the six `doc:` citations of
-  `r-readme-doc` — planned
+- `README.md` — holds: `CAP-root/readme` (reopened), and its six `doc:` citations —
+  planned
 - `SPEC.md` — holds: `CAP-root/readme`, `LIM-root/screenshot-freshness` (reopened) — planned
 
 ## Open Questions
 
-- **`q-validation`** — How will we validate that it works?
+- **`q-method-close`** — Once the method states `doc:`, how do `r-doc-form`, `r-doc-cite`,
+  `r-doc-review` and `a-doc-any-path` leave this plan? They are delivered outside the tree,
+  so no landing takes them out, and the chain cannot be done while they stay.
   - **options:**
-    - (a) A demonstration review: in a scratch copy of the tree, change the declaration of
-      one capability the README cites with `doc:` (say `CAP-app/posed-layout`), run the
-      review, and see it list the README and judge whether the README still matches; plus a
-      search showing the README carries six `doc:` and no `uses:`.
-    - (b) Only the search over the README's citations, and a reading of the new rule.
-    - (c) Wait for the next real change to one of those capabilities, and see its review read
-      the README.
-  - **recommended:** (a), because it shows the brief's own claim ("review reads every file
-    that cites it with `doc:`") happening, now, without waiting on a real change.
-  - **unblocks:** the Success signal; the success criteria of every item to come
-  - **raised by:** the brief, "when a change touches a capability, review reads every file
-    that cites it with `doc:`"
-  - **answer:**
-- **`q-method-home`** — Where is the `doc:` form stated, and where is review told to read
-  `doc:` files? The other four forms, and the review's checklist, live in the method, which
-  this chain's plan and steps may not name.
-  - **options:**
-    - (a) In the method, as a direct edit outside this chain, reviewed like any change made
-      outside refine; this chain then lands only the tree's side (the README and the root
-      `SPEC.md`), and waits on that edit.
-    - (b) In the tree too: the chain also lands a review-held claim in the root `SPEC.md`
-      stating the `doc:` form and what review does with it, so the tree explains its own
-      citations; the method is still edited to recognize it.
-    - (c) Only in the tree, as in (b), with the method left as it is.
-  - **recommended:** (a), because the four forms it joins live in the method, and a README
-    carrying `doc:` would fail review until the method knows the form; (c) would leave the
-    method saying "four forms and no others".
-  - **unblocks:** `r-doc-form`, `r-doc-review`, and where they land
-  - **raised by:** the brief, "add a fifth citation form", and "review reads every file that
-    cites it with `doc:`"
-  - **answer:**
-- **`q-doc-mismatch`** — When review finds a `doc:` file that no longer matches the
-  capability it cites, what does it do?
-  - **options:**
-    - (a) It is a finding that breaks the review, like a claim that does not hold: the change
-      is not committed until the file is updated.
-    - (b) It is recorded as a warning, and the change may be committed.
-  - **recommended:** (a), because a warning is how the README fell out of date the first
-    time: nothing made anyone update it.
-  - **unblocks:** `r-doc-review`
-  - **raised by:** the brief, "asks whether it still matches: words, pictures, samples"
-  - **answer:**
-- **`q-doc-header`** — Can a `doc:` citation be a file's header citation, the one that
-  covers the whole file (for a shipped sample that provides nothing itself)?
-  - **options:**
-    - (a) No: a file's header still cites `provides:`, `enforces:`, `uses:` or
-      `demonstrates:`; `doc:` sits beside it and covers no lines.
-    - (b) Yes: a file that only shows another part's behaviour may carry `doc:` as its
-      header citation.
-  - **recommended:** (a), because `doc:` "constrains nothing", so a file covered only by it
-    would answer to no claim of its own part.
-  - **unblocks:** `r-doc-form`, `r-doc-cite`
-  - **raised by:** the brief, "a sample", and "it constrains nothing"
+    - (a) The step after the method edit records them as amended: dropped from this chain,
+      with the user's confirmation that the method now says each of them.
+    - (b) The chain also lands a review-held claim in the root `SPEC.md` stating the form and
+      what review does with it, and they land there (the tree-side route that `q-method-home`
+      did not take).
+  - **recommended:** (a), because it keeps the answer to `q-method-home`: the form lives in
+    the method, and an amendment is the fate that records a decision the user confirms.
+  - **unblocks:** `r-doc-form`, `r-doc-cite`, `r-doc-review`, `a-doc-any-path`, and the
+    chain's `done`
+  - **raised by:** the answer to `q-method-home`, (a), which delivers those requirements
+    outside the tree
   - **answer:**
