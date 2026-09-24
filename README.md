@@ -1,8 +1,8 @@
 <!-- [provides: CAP-root/readme] what the app is, how it looks, where to download it and
 how to install it, for a friend opening the repository on GitHub. The screenshot shows the
 app's screen as these capabilities make it, so a change to any of them retakes it:
-[uses: CAP-app/pick-digit-count] [uses: CAP-app/new-pair] [uses: CAP-app/posed-layout]
-[uses: CAP-app/right-to-left-entry] [uses: CAP-app/check-at-end] [uses: CAP-app/try-again] -->
+[doc: CAP-app/pick-digit-count] [doc: CAP-app/new-pair] [doc: CAP-app/posed-layout]
+[doc: CAP-app/right-to-left-entry] [doc: CAP-app/check-at-end] [doc: CAP-app/try-again] -->
 # Mental arithmetic
 
 An Android app for practising multiplication the way it is done by hand. Pick how many
