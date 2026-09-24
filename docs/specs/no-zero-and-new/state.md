@@ -1,10 +1,10 @@
 ---
 idea: no-zero-and-new
 chain: trunk
-step: 1
+step: 2
 status: refining
 waits on: none
-remaining: 2q + 1r + 0i + 7f
+remaining: 0q + 0r + 1i + 7f
 ---
 
 # No 0 digit in A and B, and New in place of Try again after a correct result
@@ -17,13 +17,20 @@ remaining: 2q + 1r + 0i + 7f
 
 ## Requirements
 
-- **`r-new-when-correct`** — At the end of a game, if the result is correct, a New button
-  stands where Try again stands now, and poses a new `A` and `B`.
+No requirements left.
 
 ## To land
 
-Nothing yet: `r-new-when-correct` has no success criterion until `q-validation` is
-answered, and its meaning of "correct" waits on `q-correct-means`.
+- **`CAP-app/new-when-correct`** — After a check where no line carries a mark, a New
+  button takes Enter's place; tapping it poses a new `A` and `B`.
+  - **success:** On the Android Studio emulator on Windows, a game is played through `adb`
+    to a check where no line carries a mark, and the screenshot shows New in Enter's place;
+    New is tapped, and the screenshot shows a new `A × B`.
+  - **lands in:** `app/SPEC.md`
+  - **held in:** `app/src/main/kotlin/mentalarithmetic/app/Practice.kt` (whether no line
+    carries a mark, and what New does), `app/src/main/kotlin/mentalarithmetic/app/PracticeScreen.kt`
+    (the key in Enter's place)
+  - **status:** planned
 
 ## Reopened
 
@@ -32,27 +39,53 @@ answered, and its meaning of "correct" waits on `q-correct-means`.
     with exactly n digits." with success "A JVM unit test, run in the Docker build, shows
     that for each n from 2 to 6, every one of 1000 draws gives `A` and `B` of exactly n
     digits." and assumes "exactly n digits means no leading zero."
-  - **change:** neither `A` nor `B` has a 0 digit, in any position; its success criterion
-    waits on `q-validation`.
-  - **authority:** the brief: "no "0" digit in A/B"
+  - **change:** the claim becomes "For a digit count n from 2 to 6, `A` and `B` are drawn
+    at random, each with exactly n digits, none of them 0.", its success "A JVM unit test,
+    run in the Docker build, shows that for each n from 2 to 6, every one of 1000 draws
+    gives `A` and `B` of exactly n digits, none of them a 0.", and its assumes line goes,
+    since a number with no 0 digit has no leading zero.
+  - **authority:** the brief: "no "0" digit in A/B"; the success, the answer to
+    `q-validation`
   - **held in:** `multiplication/src/main/kotlin/mentalarithmetic/multiplication/Operands.kt`
     (the draw)
   - **status:** planned
 - **`CAP-app/try-again`** — in `app/SPEC.md`
   - **now says:** "After the check, a Try again button takes Enter's place; tapping it
     clears every digit the user typed and poses the same `A` and `B` again."
-  - **change:** Try again takes Enter's place only after a check where the result is not
-    correct; after a correct one, New takes it, per `r-new-when-correct`.
+  - **change:** the claim becomes "After a check where some line carries a mark, a Try
+    again button takes Enter's place; tapping it clears every digit the user typed and
+    poses the same `A` and `B` again.", and its success "On the Android Studio emulator on
+    Windows, after a check where some line carries a mark, Try again is tapped through
+    `adb`, and the screenshot shows the typed digits cleared and `A` and `B` unchanged."
+    After a check where no line carries a mark, New takes its place, per
+    `CAP-app/new-when-correct`.
   - **authority:** the brief: "at the end of a game, if the result is correct, insteady of
-    "try again" => "new""
+    "try again" => "new""; "correct", the answer to `q-correct-means`; the success, the
+    answer to `q-validation`
   - **held in:** `app/src/main/kotlin/mentalarithmetic/app/PracticeScreen.kt` (the key in
     Enter's place), `app/src/main/kotlin/mentalarithmetic/app/Practice.kt` (what Try
     again does)
   - **status:** planned
+- **`LIM-app/hidden-when-sideways`** — in `app/SPEC.md`
+  - **now says:** "Held sideways, the app is shown upright in a letterbox too short for the
+    multiplication, which is hidden until the device is turned upright again, the practice
+    kept: `CAP-app/posed-layout`, the lines typed under `CAP-app/right-to-left-entry`, the
+    marks of `CAP-app/check-at-end`, and what `CAP-app/pick-digit-count`,
+    `CAP-app/new-pair` and `CAP-app/try-again` pose hold only while it is upright."
+  - **change:** `CAP-app/new-when-correct` is named beside `CAP-app/try-again`: "… and what
+    `CAP-app/pick-digit-count`, `CAP-app/new-pair`, `CAP-app/try-again` and
+    `CAP-app/new-when-correct` pose hold only while it is upright."
+  - **authority:** the brief: "insteady of "try again" => "new"": the New in Enter's place
+    is hidden sideways as Try again is
+  - **held in:** no code: review
+  - **status:** planned
 
 ## Success signal
 
-Nothing yet: it waits on `q-validation`.
+- **`s-no-zero-and-new`** — The unit test shows, for each count from 2 to 6, 1000 draws of
+  `A` and `B` with no 0 digit; and on the emulator, a game ended with every line right
+  shows New in Enter's place, which poses a new `A × B`, while a game ended with an error
+  still shows Try again.
 
 ## Assumptions
 
@@ -60,7 +93,8 @@ Nothing yet: it waits on `q-validation`.
   the top does (`CAP-app/new-pair`): it poses a new `A` and `B` of the digit count
   currently chosen.
   - **raised by:** the brief: "insteady of "try again" => "new""
-  - **bears on:** `r-new-when-correct`
+  - **bears on:** `CAP-app/new-when-correct`, as its assumes line "the new `A` and `B` have
+    the digit count currently chosen."
 
 ## Files
 
@@ -70,40 +104,16 @@ Nothing yet: it waits on `q-validation`.
   `CAP-multiplication/draw-operands` (reopened) — planned
 - `multiplication/src/test/kotlin/mentalarithmetic/multiplication/OperandsTest.kt` —
   holds: `CAP-multiplication/draw-operands` (reopened, its demonstration) — planned
-- `app/SPEC.md` — holds: `CAP-app/try-again` (reopened) — planned
+- `app/SPEC.md` — holds: `CAP-app/try-again` (reopened), `CAP-app/new-when-correct`,
+  `LIM-app/hidden-when-sideways` (reopened) — planned
 - `app/src/main/kotlin/mentalarithmetic/app/Practice.kt` — holds: `CAP-app/try-again`
-  (reopened) — planned
+  (reopened), `CAP-app/new-when-correct` — planned
 - `app/src/main/kotlin/mentalarithmetic/app/PracticeScreen.kt` — holds:
-  `CAP-app/try-again` (reopened) — planned
+  `CAP-app/try-again` (reopened), `CAP-app/new-when-correct` — planned
 - `.github/screenshot.png` — holds: the README's screenshot under `CAP-root/readme`, kept,
   which shows `405 × 186`: once the reopened draw lands, `A` = 405 is a pair the app can no
   longer pose, so the screenshot is taken again — planned
 
 ## Open Questions
 
-- **`q-validation`** — How will we validate that it works?
-  - **options:**
-    - (a) A JVM unit test, run in the Docker build, shows that for each n from 2 to 6,
-      every one of 1000 draws gives `A` and `B` of exactly n digits, none of them a 0; and on
-      the Android Studio emulator on Windows, through `adb`, a game is played to a correct
-      result and the screenshot shows New in Enter's place, tapping it shows a new `A × B`,
-      and a game ended with an error still shows Try again
-    - (b) The same, without the emulator: only the unit test, and the app's change judged
-      by reading the code
-  - **recommended:** (a), because the draw is already shown by a unit test, and every
-    screen of the app is shown on the emulator already
-  - **unblocks:** `CAP-multiplication/draw-operands` (reopened), `r-new-when-correct`,
-    `CAP-app/try-again` (reopened), the Success signal
-  - **raised by:** every brief is asked it
-  - **answer:**
-- **`q-correct-means`** — "If the result is correct": which lines must be right for New to
-  replace Try again?
-  - **options:**
-    - (a) Only the result line: it carries no mark, even if a partial product is wrong
-    - (b) Every line: no partial product and not the result carries any mark
-  - **recommended:** (a), because it is what the brief says, and a user who reached the
-    right result by keeping part of it in their head has done the mental arithmetic
-  - **unblocks:** `r-new-when-correct`, `CAP-app/try-again` (reopened)
-  - **raised by:** the brief: "if the result is correct", read against
-    `CAP-multiplication/check-lines`, which marks every typed line
-  - **answer:**
+None.
