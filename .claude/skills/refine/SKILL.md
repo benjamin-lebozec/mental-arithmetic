@@ -159,7 +159,9 @@ say. If the next run would need it, write it:
      commit.
 
    **Check that the review ran.** The reviewer returns a report path. Check that:
-   - the file exists, and its `items:` count matches the numbered items in its Checks;
+   - the file exists, its `items:` count matches the numbered items in its Checklist, and
+     no item is still `pending`;
+   - its `result:` is neither `pending` nor `stale`;
    - its `base:` is `git log -1 --diff-filter=A --format=%H -- docs/reviews/`, or `none
      (bootstrap)` when that finds nothing;
    - its `fingerprint:` equals the fingerprint command in the reviewer's instructions, run

@@ -11,11 +11,12 @@ has a Contract section, which its additions are held to. The next reader will ha
 files and the code, and no author to ask. Your whole job is to hold them against each other
 and report where they disagree.
 
-You work in three phases, and file one report:
-1. **Checklist** — list everything this review must check, before judging any of it.
-2. **Checks** — give each checklist item a verdict, with its evidence.
-3. **Report** — the overall result, written to `docs/reviews/` and summarised in your final
-   message.
+You work in three phases, on one report file:
+1. **Checklist** — list everything this review must check, before judging any of it, and
+   write it as the report, every item's verdict `pending`.
+2. **Checks** — give each item its verdict and evidence, in the report, item by item.
+3. **Close** — check the report is complete, then write its result and Summary, and
+   summarise it in your final message.
 
 `CLAUDE.md`'s rules are already in your context: do not read the file again.
 
@@ -67,7 +68,7 @@ Build it from the change, by search, before you judge anything. Keep the turns f
 the searches as one Bash command with labelled sections, and pipe long listings through
 `head`.
 
-**Scope facts**, first in the list:
+**Scope facts**, for the report's Scope section:
 - the scope (`change` or `full`, and why), the base and how it was found, and the
   fingerprint;
 - the changed shipped files, and separately the changed scaffolding files (these are not
@@ -112,13 +113,19 @@ the tree.
 
 This list is the review's commitment. Every item gets a verdict in phase 2, and nothing is
 judged that the list does not hold. If a check turns up something the list missed, add it
-as a new item, marked as added in phase 2.
+as a new item at the end of the list, marked `(added in phase 2)`.
+
+**Phase 1 ends by writing the report** (see The report file): front matter with
+`result: pending`, then the checklist, every item ending `— pending`. Nothing is judged
+before this file exists.
 
 ## Phase 2: check each item
 
-Take the items in order. For each, give the verdict (see Verdicts), and the evidence: the
-search run and what it returned, or the lines read. Read code by the lines a claim points
-at, not whole, unless the file is short. A clean item is one line.
+Take the items in order. For each, replace its `pending` in the report with the verdict
+(see Verdicts) and the evidence: the search run and what it returned, or the lines read.
+Write each verdict as soon as it is reached, not in one pass at the end: a review that
+stops half way leaves its remaining items visibly `pending`. Read code by the lines a claim
+points at, not whole, unless the file is short. A clean item's verdict fits on its line.
 
 ### Rules (M-items)
 
@@ -216,7 +223,17 @@ Give each item one verdict:
 - **`restates`** — a spec line that only repeats the code.
 - **`undecidable`** — it cannot be judged here. Say plainly what would decide it.
 
-## Phase 3: the report
+## Phase 3: close
+
+First the global check, on the file as written:
+- no item is still `pending`;
+- `items:` equals the number of numbered items, those added in phase 2 included;
+- the fingerprint, run again now, is the one in the front matter. If it differs, the tree
+  changed under the review: say so in the Summary and set `result: stale`.
+
+Then set `result:` from the verdicts, and write the Summary.
+
+## The report file
 
 Write it to `docs/reviews/<YYYY-MM-DD>-<label>.md`, where `<label>` is what the prompt
 gives (for refine, `<idea>[-<branch>]-step-<N>`, with `-round-<k>` from the second round
@@ -231,18 +248,24 @@ No tables; the report is read raw. Its shape:
     base: <sha> | none (bootstrap)
     fingerprint: <16 hex>
     items: <n>
-    result: clean | <m> not holds
+    result: pending | clean | <m> not holds | stale
     ---
 
-    ## Checklist
-    <phase 1: the scope facts, the touched ids, then the numbered items, each with what,
-    where, how and, for a C-item, its reach>
+    ## Scope
+    <the scope facts and the touched ids>
 
-    ## Checks
-    <phase 2: one bullet per item, by number: the verdict and its evidence. Items that hold
-    may be grouped by number range when their evidence is one search.>
+    ## Checklist
+    <the numbered items, grouped by kind (M, D, C, A, S). Each item is one paragraph: what
+    it checks, where, how and, for a C-item, its reach; then ` — ` and its verdict with the
+    evidence (`pending` until phase 2 reaches it). For example:
+
+    17. C `CAP-root/docker-build`: the citing files, reach 9. — **holds**: build.sh builds
+        the image and runs `gradle assembleDebug test` in it; Dockerfile carries JDK 17.
+
+    Items that hold on one shared search may give it once and the others refer to it.>
 
     ## Summary
+    <written in phase 3>
     - the counts per verdict;
     - for each verdict that is not `holds`: the item, the claim quoted, what the tree
       actually does, and where you looked. No severity, no ranking;
