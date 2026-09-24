@@ -80,8 +80,9 @@ and the counts. Otherwise: "None."}
 
 ## Reviews
 
-{The module-contract-reviewer's scope (the change, or the whole tree), its verdicts that
-are not `holds`, the number that are, and what was fixed before proving. Otherwise: "None:
+{The module-contract-reviewer's scope (the change since the last review, or the whole
+tree and why), its number of rounds, its verdicts that are not `holds`, the number that
+are, and what was fixed before proving. Never the report's path. Otherwise: "None:
 nothing in the tree changed."}
 
 ## Proof

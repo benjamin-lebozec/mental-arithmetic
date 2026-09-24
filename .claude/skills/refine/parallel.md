@@ -19,14 +19,19 @@ agents it starts never start agents of their own.
    Chains write disjoint files, so they share the working tree safely. A demonstration that
    needs the whole application running (shared database, ports, one dev server) is the
    exception: run those one at a time.
-3. **Review and prove every chain at once.** Start the reviewers, then one prover per
-   chain. Send each chain's failures back to its own agent to fix, and prove again, up to
-   three rounds per chain.
+3. **Review and prove every chain at once.** Start one reviewer for the whole run: it
+   reviews everything since the last review, which is every chain's change together. Give
+   it the label `<idea>-step-<N+1>` and the ids every chain's step declared, changed or
+   retired. Then start one prover per chain. Send each chain's failures back to its own
+   agent to fix, and prove again, up to three rounds per chain.
 4. **Record, then stop for the user's review of every chain at once**, as "Stop for the
    user's review" says, chain by chain in one hand-over. The user may commit some chains
    and hold off others.
 5. **Commit the approved chains, one at a time.** Commits go through the shared git index,
-   so this session makes them sequentially, each staging only its own chain's paths.
+   so this session makes them sequentially, each staging only its own chain's paths. The
+   review reports go in the last of those commits, after the fingerprint check "Commit"
+   describes. A chain held off stays uncommitted and so falls into the next review's
+   change: it is reviewed again, never skipped.
 6. **Ask and report.** Ask all the new questions together, then give one summary for the
    idea: which chains moved, which wait on the user, and which are done.
 

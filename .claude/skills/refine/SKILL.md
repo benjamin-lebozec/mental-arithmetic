@@ -149,12 +149,25 @@ say. If the next run would need it, write it:
 
 5. **Review and prove.** Launch both agents in the same message, so they run in parallel.
    They judge different things, and a fix to either's finding is proved again anyway.
-   - The `module-contract-reviewer`, when the tree changed. Give it step-N's commit and
-     scope `change`. Use scope `full` when this step takes the chain to `done`, adds a
-     module, or edits a module rule. Name, in the prompt, the ids whose declaration this
-     step added, changed or retired: the reviewer walks each of them over the whole tree.
+   - The `module-contract-reviewer`, when shipped files changed since the last review. It
+     finds its own base (the last commit that added a report under `docs/reviews/`) and
+     reviews everything since, so do not give it a commit or a scope. Give it its report
+     label, `<idea>[-<branch>]-step-<N+1>` (with `-round-<k>` from the second round on),
+     and name the ids whose declaration this step added, changed or retired: it walks each
+     of them over the whole tree.
    - The `refinement-prover` in `prove` mode, given the chain, step-N+1, and step-N's
      commit.
+
+   **Check that the review ran.** The reviewer returns a report path. Check that:
+   - the file exists, and its `items:` count matches the numbered items in its Checks;
+   - its `base:` is `git log -1 --diff-filter=A --format=%H -- docs/reviews/`, or `none
+     (bootstrap)` when that finds nothing;
+   - its `fingerprint:` equals the fingerprint command in the reviewer's instructions, run
+     now on this tree.
+
+   A report that fails any of these is not a review: run the reviewer again. A fix made
+   after the report changes the fingerprint, so it gets a new round. That is intended:
+   nothing is committed that the report did not see.
 
    Fix what the reviewer finds and each failure the prover reports, in the plan, the step,
    a spec or the code. Keep the step's Changes matching the diffs. A reviewer fix is then
@@ -179,6 +192,7 @@ say. If the next run would need it, write it:
    Give them, in the conversation:
    - the step file, the plan's diff, each spec's diff, every file the step wrote or
      changed, by path, and the `git diff --stat`;
+   - the review report's path, and its Summary;
    - what was decided and what landed where, and each prover or reviewer verdict that is
      not `discharged`;
    - each item settled and landed in this step under standing authorization, with the
@@ -190,14 +204,20 @@ say. If the next run would need it, write it:
    questions yet: the review is about what was done, the questions about what comes next.
    - **Commit:** go on to 8.
    - **Edited:** ask what they meant by each change that alters a commitment or a claim,
-     and record it under Amendments with their words. Then go back to 5, prove again, and
-     stop here again after it.
+     and record it under Amendments with their words. Then go back to 5, review and prove
+     again, and stop here again after it.
    - **Hold off:** stop. Leave everything uncommitted. The next run resumes here.
 
 8. **Commit.** Stage exactly these files by path, never with `git add -A` or `git add .`:
    - the new step;
    - the plan;
-   - every spec and file this step wrote, changed or deleted.
+   - every spec and file this step wrote, changed or deleted;
+   - every review report this step's rounds wrote.
+
+   Just before committing, run the fingerprint once more and compare it with the last
+   report's. If they differ, the tree changed since the review: go back to 5. The next
+   review's base is this commit, so a report committed with a tree it did not see would
+   let that difference go unreviewed.
 
    Commit with the message
    `refine(<idea>[/<branch>]): step-<N+1> — <one line: what was decided or landed>`, ending
@@ -295,7 +315,8 @@ Questions between steps go to the user in the conversation, never only in a file
 - **Keep the record short.** Changes quotes old plan text in full. A landed item says only
   where it went, unless it landed reworded. The Proof section gives one bullet per
   obligation with a line or two of evidence. The Reviews section gives the verdicts that
-  are not `holds` and a count of the rest. Do not paste whole reports.
+  are not `holds` and a count of the rest. Do not paste whole reports, and do not name the
+  report's path: reports are scaffolding, and a step never cites the scaffolding.
 
 ## Landing
 

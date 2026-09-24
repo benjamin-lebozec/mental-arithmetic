@@ -50,7 +50,7 @@ consequence is an open experiment: the rule above is meant to make it safe by de
 
 **Scaffolding** is how the work gets done, not a record of what was decided. It covers
 everything under `.claude/`, the flat specs directly in `docs/specs/`
-(`docs/specs/*.md`), everything under `docs/mockups/`, this file, session planning files
+(`docs/specs/*.md`), everything under `docs/mockups/` and `docs/reviews/`, this file, session planning files
 (not a chain's `state.md`) and session notes. The steps and plans under
 `docs/specs/<idea>/` are **not** scaffolding. They are the record, but no code and no
 `SPEC.md` depends on them.
@@ -186,20 +186,32 @@ rules by reading:
   - and the changes it records
 
   together refine the plan before.
-- The **`module-contract-reviewer`** holds the tree:
+- The **`module-contract-reviewer`** holds the tree, over **the change since the last
+  review**:
   - the citation rules (declaration, forward, demonstrated, backward, path, direction, kind,
-    coverage, severance), over each step's change, and over every shipped file when a chain reaches
-    `done`, a module is added, a module rule changes, or a change was made outside refine;
-  - every `SPEC.md` claim against the code under it. Which claims it walks follows the
-    change: the ids the change touches, each judged over the whole tree; and, whenever the
-    citation rules run over every shipped file, every claim that code elsewhere can break
-    without citing it — each `NOT-`, each `INV-` held by review, each `REQ-` and each
-    `LIM-`. Code under a `CAP-` or a code-held `INV-` that nothing has changed since its
-    last review is not read again. That rests on every change to that code having been
-    reviewed, so a commit no step accounts for brings back the walk over every claim in the
-    tree, and so does a module rule changing;
+    coverage, severance), over the changed files and every file citing an id the change
+    touches;
+  - every `SPEC.md` claim the change can reach: each id the change touches, judged over its
+    whole reach in the tree; and, for each changed file, each `NOT-`, `INV-` held by review,
+    `REQ-` and `LIM-` on its path, judged against that file;
   - every addition to an open part against that part's contract;
   - that no two chains in flight list the same file.
+
+  It first lists what it will check, then checks each item, then files a report under
+  `docs/reviews/`. The last committed report marks what has been reviewed: the next review
+  starts from its commit, so a change nobody reviewed is part of the next review, never
+  skipped. Refine commits each report only with the exact tree it saw.
+
+The reason for reviewing only the change: an unchanged file cannot newly break a claim, and
+a review whose cost grows with the tree ends up skipped. The whole tree is walked only when
+there is no report yet (the first review, or after `docs/` was deleted), or when asked for
+an audit of claims about the world outside the tree. A changed citation rule is run over
+every shipped file, alone.
+
+So the cost of a change to a `SPEC.md` is the reach of the ids it touches, and a claim
+declared high in the tree reaches everything under it. That is one more reason a claim lands
+in the lowest directory it governs, and why a feature lives in its own module with its own
+`SPEC.md`. Each report lists the widest reaches it walked.
 
 The cost is stated: nothing holds these rules between reviews. That is why refine runs both
 agents in every step, and why a change made outside refine gets a review too.
@@ -211,7 +223,10 @@ agents in every step, and why a change made outside refine gets a review too.
   hold all the state it needs. Questions between steps are asked in the conversation, and
   their answers are recorded in the plan.
 - **Architecture.** A decision the code must keep honouring lands as an id in the `SPEC.md`
-  above the code it governs. Choosing that directory is part of making the decision.
+  above the code it governs, in the **lowest** directory that holds all of that code.
+  Choosing that directory is part of making the decision. A claim held by review high in
+  the tree is re-judged whenever anything under it changes, so it needs a reason to sit
+  there.
 - **Testing.** Rules for tests written from now on; existing tests are not changed to
   follow them.
   - **A test of an `INV-` held by code is a unit test, and it is quick.** It is a JVM test
@@ -235,7 +250,6 @@ agents in every step, and why a change made outside refine gets a review too.
   not landed until its code cites it, its `SPEC.md` declares it, and the step is proved.
 - **Reviewing.** Refine runs both agents in every step. Run the
   `module-contract-reviewer` yourself on any change made outside refine, and always on one
-  that adds a module, touches an open part, or touches a `SPEC.md`. A review over every
-  shipped file checks git for commits that no step accounts for since the last one; finding
-  any, it walks every claim in the tree, because the narrowed walk assumes each of those
-  changes was reviewed when it was made.
+  that adds a module, touches an open part, or touches a `SPEC.md`. Commit its report with
+  the change it reviewed, and only if nothing shipped changed since the review. No shipped
+  file, step or plan cites a report.
