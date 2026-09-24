@@ -49,11 +49,18 @@ each partial product and the result, right to left, then sees what they got wron
     `adb`, and the screenshot shows which digits are wrong, missing or extra.
   - **assumes:** after the check, the digit and erase keys do nothing until Try again, a
     count button or New is tapped.
-- **`CAP-app/try-again`** — After the check, a Try again button takes Enter's place;
-  tapping it clears every digit the user typed and poses the same `A` and `B` again.
-  - **success:** On the Android Studio emulator on Windows, after the check, Try again is
-    tapped through `adb`, and the screenshot shows the typed digits cleared and `A` and `B`
-    unchanged.
+- **`CAP-app/try-again`** — After a check where some line carries a mark, a Try again
+  button takes Enter's place; tapping it clears every digit the user typed and poses the
+  same `A` and `B` again.
+  - **success:** On the Android Studio emulator on Windows, after a check where some line
+    carries a mark, Try again is tapped through `adb`, and the screenshot shows the typed
+    digits cleared and `A` and `B` unchanged.
+- **`CAP-app/new-when-correct`** — After a check where no line carries a mark, a New
+  button takes Enter's place; tapping it poses a new `A` and `B`.
+  - **success:** On the Android Studio emulator on Windows, a game is played through `adb`
+    to a check where no line carries a mark, and the screenshot shows New in Enter's place;
+    New is tapped, and the screenshot shows a new `A × B`.
+  - **assumes:** the new `A` and `B` have the digit count currently chosen.
 
 ## Invariants
 
@@ -91,5 +98,5 @@ each partial product and the result, right to left, then sees what they got wron
   letterbox too short for the multiplication, which is hidden until the device is turned
   upright again, the practice kept: `CAP-app/posed-layout`, the lines typed under
   `CAP-app/right-to-left-entry`, the marks of `CAP-app/check-at-end`, and what
-  `CAP-app/pick-digit-count`, `CAP-app/new-pair` and `CAP-app/try-again` pose hold only
-  while it is upright.
+  `CAP-app/pick-digit-count`, `CAP-app/new-pair`, `CAP-app/try-again` and
+  `CAP-app/new-when-correct` pose hold only while it is upright.

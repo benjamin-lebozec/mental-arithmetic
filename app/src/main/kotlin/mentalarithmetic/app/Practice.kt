@@ -75,6 +75,14 @@ class Practice(private val random: Random = Random.Default) {
         marks = check(posed, typed)
     }
 
+    // [provides: CAP-app/new-when-correct] checked, and no line carries a mark.
+    val correct: Boolean get() = marks?.all { it.isEmpty() } == true
+
+    // [provides: CAP-app/new-when-correct] poses a new A × B of the digit count chosen.
+    fun newPair() {
+        pickDigitCount(digitCount)
+    }
+
     // [provides: CAP-app/try-again] clears the typed digits and keeps A and B.
     fun tryAgain() {
         clearTyped()

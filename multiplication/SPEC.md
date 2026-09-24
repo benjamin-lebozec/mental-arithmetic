@@ -10,10 +10,9 @@ user types, and checking what they typed.
 ## Capabilities
 
 - **`CAP-multiplication/draw-operands`** — For a digit count n from 2 to 6, `A` and `B`
-  are drawn at random, each with exactly n digits.
+  are drawn at random, each with exactly n digits, none of them 0.
   - **success:** A JVM unit test, run in the Docker build, shows that for each n from 2 to
-    6, every one of 1000 draws gives `A` and `B` of exactly n digits.
-  - **assumes:** exactly n digits means no leading zero.
+    6, every one of 1000 draws gives `A` and `B` of exactly n digits, none of them a 0.
 - **`CAP-multiplication/partial-products`** — For `A` and `B`, the lines of the posed
   multiplication are given: one partial product per digit of `B`, from its rightmost digit
   leftwards, the k-th (from 0) being the digits of `A` times that digit, to be typed, and

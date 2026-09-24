@@ -209,13 +209,17 @@ private fun Keypad(practice: Practice) {
     }
 }
 
-// [provides: CAP-app/try-again] after the check, Try again takes Enter's place.
+// [provides: CAP-app/try-again] after a check where some line carries a mark, Try again
+// takes Enter's place.
 @Composable
 private fun EndKey(practice: Practice, modifier: Modifier) {
-    if (practice.checked) {
-        Key("Try again", true, modifier) { practice.tryAgain() }
-    } else {
-        Key("Enter", true, modifier) { practice.enter() }
+    when {
+        // [provides: CAP-app/new-when-correct] after a check where no line carries a mark,
+        // New takes Enter's place.
+        practice.correct -> Key("New", true, modifier) { practice.newPair() }
+        // [provides: CAP-app/try-again]
+        practice.checked -> Key("Try again", true, modifier) { practice.tryAgain() }
+        else -> Key("Enter", true, modifier) { practice.enter() }
     }
 }
 
